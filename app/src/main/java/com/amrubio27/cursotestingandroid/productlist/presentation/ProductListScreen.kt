@@ -76,7 +76,7 @@ fun ProductListScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    //state.sealed...
+                    state.selectedCategory
                 }
             }
         }
