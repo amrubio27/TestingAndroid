@@ -1,5 +1,6 @@
 package com.amrubio27.cursotestingandroid.productlist.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,19 +23,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration.Companion.LineThrough
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.amrubio27.cursotestingandroid.core.presentation.ext.toPriceAmount
-import com.amrubio27.cursotestingandroid.productlist.domain.model.Product
+import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromotion
+import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 
 @Composable
-fun ProductItem(product: Product, onClick: (Product) -> Unit, modifier: Modifier = Modifier) {
+fun ProductItem(
+    item: ProductWithPromotion,
+    onClick: (ProductWithPromotion) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val product = item.product
+    val promotion = item.promotion
+    val promoBadge = when (promotion) {
+        is ProductPromotion.BuyXPayY -> promotion.label
+        is ProductPromotion.Percent -> "-${promotion.percent.toInt()}%"
+        null -> null
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-            .clickable { onClick(product) },
+            .clickable { onClick(item) },
         elevation = CardDefaults.cardElevation(8.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
@@ -66,7 +81,24 @@ fun ProductItem(product: Product, onClick: (Product) -> Unit, modifier: Modifier
                     )
                 }
 
-                //Promocion
+                if (promoBadge != null) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .background(
+                                color = MaterialTheme.colorScheme.error,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = promoBadge,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
 
             Column(
@@ -94,8 +126,43 @@ fun ProductItem(product: Product, onClick: (Product) -> Unit, modifier: Modifier
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (!true) {
-                        //mostramos vista promocion
+                    if (promotion is ProductPromotion.Percent) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    "Antes",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    "$${product.price.toPriceAmount()}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textDecoration = LineThrough
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    "Ahora",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    "$${promotion.discountPrice.toPriceAmount()}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                     } else {
                         Text(
                             text = "$${product.price.toPriceAmount()}",

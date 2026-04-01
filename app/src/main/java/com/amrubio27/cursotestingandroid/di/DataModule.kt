@@ -10,6 +10,7 @@ import com.amrubio27.cursotestingandroid.productlist.data.local.database.dao.Pro
 import com.amrubio27.cursotestingandroid.productlist.data.repository.ProductRepositoryImpl
 import com.amrubio27.cursotestingandroid.productlist.data.repository.PromotionRepositoryImpl
 import com.amrubio27.cursotestingandroid.productlist.domain.repository.ProductRepository
+import com.amrubio27.cursotestingandroid.productlist.domain.repository.PromotionRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,9 +24,7 @@ import javax.inject.Singleton
 object DataModule {
     @Provides
     @Singleton
-    fun provideDispatchersProvider(
-        defaultDispatchersProvider: DefaultDispatchersProvider
-    ): DispatchersProvider {
+    fun provideDispatchersProvider(): DispatchersProvider {
         return DefaultDispatchersProvider()
     }
 
@@ -41,7 +40,7 @@ object DataModule {
     @Singleton
     fun providePromotionRepository(
         promotionRepositoryImpl: PromotionRepositoryImpl
-    ): PromotionRepositoryImpl {
+    ): PromotionRepository {
         return promotionRepositoryImpl
     }
 

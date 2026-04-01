@@ -36,3 +36,27 @@ class GetPromotionForProduct @Inject constructor() {
         return null
     }
 }
+
+//O(n * m) a O(n + m)
+/**
+ * private fun List<Promotion>.getPromotionsByProductId(): Map<String, List<Promotion>> {
+ *     val mapPromotion = mutableMapOf<String, List<Promotion>>()
+ *     forEach { promotion ->
+ *         promotion.productsIds.forEach { productId ->
+ *             mapPromotion[productId] =
+ *                 mapPromotion.getOrDefault(productId, emptyList()) + promotion
+ *         }
+ *     }
+ *     return mapPromotion
+ * }
+ *
+ * class GetPromotionForProduct @Inject constructor() {
+ * operator fun invoke(
+ *         product: Product,
+ *         promotions: Map<String, List<Promotion>>
+ *     ): ProductPromotion? {
+ *         val productPromos = promotions.getOrDefault(product.id, emptyList())
+ *    ...
+ *    }
+ * }
+ */

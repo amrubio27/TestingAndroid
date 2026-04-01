@@ -2,7 +2,7 @@ package com.amrubio27.cursotestingandroid.productlist.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.amrubio27.cursotestingandroid.productlist.domain.model.Product
+import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
 import com.amrubio27.cursotestingandroid.productlist.domain.usecase.GetProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,8 +38,8 @@ class ProductListViewModel @Inject constructor(
     fun loadProducts() {
         _uiState.value = ProductListUiState.Loading
         getProductsUseCase()
-            .onEach { products: List<Product> ->
-                val categories = products.map { it.category }.distinct().sorted()
+            .onEach { products: List<ProductWithPromotion> ->
+                val categories = products.map { it.product.category }.distinct().sorted()
                 _uiState.value =
                     ProductListUiState.Success(
                         products = products,
