@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amrubio27.cursotestingandroid.productlist.domain.model.Product
+import com.amrubio27.cursotestingandroid.productlist.presentation.components.FiltersMenu
 
 @Composable
 fun ProductListScreen(
@@ -83,6 +84,9 @@ fun ProductListScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
+                    FiltersMenu(state = state) { category ->
+                        productListViewModel.setCategory(category)
+                    }
                     LazyColumn {
                         items(state.products) { product: Product ->
                             Box(

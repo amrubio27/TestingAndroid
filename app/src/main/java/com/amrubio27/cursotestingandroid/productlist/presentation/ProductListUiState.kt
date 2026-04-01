@@ -7,8 +7,8 @@ sealed class ProductListUiState {
     data class Error(val message: String) : ProductListUiState()
     data class Success(
         val products: List<Product>, //de momento usamos el modelo de dominio, luego creamos uno de ui
-        //val categories:List<>.
-        //val selectedCategory: String,
+        val categories: List<String>,
+        val selectedCategory: String?,
         //sortOption
     ) : ProductListUiState()
 

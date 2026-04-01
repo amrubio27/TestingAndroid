@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
@@ -33,12 +34,24 @@ class ProductListViewModel @Inject constructor(
         _uiState.value = ProductListUiState.Loading
         getProductsUseCase()
             .onEach { products: List<Product> ->
-                _uiState.value = ProductListUiState.Success(products)
+                val categories = products.map { it.category }.distinct().sorted()
+                _uiState.value =
+                    ProductListUiState.Success(
+                        products = products,
+                        categories = categories,
+                        selectedCategory = null
+                    )
             }
             .catch { exception: Throwable ->
                 _uiState.value = ProductListUiState.Error(exception.message.orEmpty())
             }
             .launchIn(viewModelScope)
 
+    }
+
+    fun setCategory(category: String?) {
+        viewModelScope.launch {
+            //llamar al settingsRepository
+        }
     }
 }
