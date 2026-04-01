@@ -8,6 +8,7 @@ import com.amrubio27.cursotestingandroid.productlist.data.local.database.MiniMar
 import com.amrubio27.cursotestingandroid.productlist.data.local.database.dao.ProductDao
 import com.amrubio27.cursotestingandroid.productlist.data.local.database.dao.PromotionDao
 import com.amrubio27.cursotestingandroid.productlist.data.repository.ProductRepositoryImpl
+import com.amrubio27.cursotestingandroid.productlist.data.repository.PromotionRepositoryImpl
 import com.amrubio27.cursotestingandroid.productlist.domain.repository.ProductRepository
 import dagger.Module
 import dagger.Provides
@@ -35,6 +36,15 @@ object DataModule {
     ): ProductRepository {
         return productRepositoryImpl
     }
+
+    @Provides
+    @Singleton
+    fun providePromotionRepository(
+        promotionRepositoryImpl: PromotionRepositoryImpl
+    ): PromotionRepositoryImpl {
+        return promotionRepositoryImpl
+    }
+
 
     @Provides
     fun provideProductDao(database: MiniMarketDatabase): ProductDao = database.productDao()

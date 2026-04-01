@@ -19,9 +19,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ProductRepositoryImpl @Inject constructor(
-    val remoteDataSource: RemoteDataSource,
-    val localDataSource: LocalDataSource,
-    val dispatchersProvider: DispatchersProvider
+    private val remoteDataSource: RemoteDataSource,
+    private val localDataSource: LocalDataSource,
+    private val dispatchersProvider: DispatchersProvider
 ) : ProductRepository {
     private val refreshScope = CoroutineScope(SupervisorJob() + dispatchersProvider.io)
     private val refreshMutex = Mutex()
