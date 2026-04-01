@@ -3,6 +3,7 @@ package com.amrubio27.cursotestingandroid.productlist.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amrubio27.cursotestingandroid.productlist.domain.model.Product
+import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
 import com.amrubio27.cursotestingandroid.productlist.domain.usecase.GetProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -39,7 +40,8 @@ class ProductListViewModel @Inject constructor(
                     ProductListUiState.Success(
                         products = products,
                         categories = categories,
-                        selectedCategory = null
+                        selectedCategory = null,
+                        sortOption = SortOption.NONE
                     )
             }
             .catch { exception: Throwable ->
@@ -50,6 +52,12 @@ class ProductListViewModel @Inject constructor(
     }
 
     fun setCategory(category: String?) {
+        viewModelScope.launch {
+            //llamar al settingsRepository
+        }
+    }
+
+    fun setSortOption(sortOption: SortOption) {
         viewModelScope.launch {
             //llamar al settingsRepository
         }

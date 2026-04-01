@@ -1,6 +1,7 @@
 package com.amrubio27.cursotestingandroid.productlist.presentation
 
 import com.amrubio27.cursotestingandroid.productlist.domain.model.Product
+import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
 
 sealed class ProductListUiState {
     data object Loading : ProductListUiState()
@@ -9,7 +10,7 @@ sealed class ProductListUiState {
         val products: List<Product>, //de momento usamos el modelo de dominio, luego creamos uno de ui
         val categories: List<String>,
         val selectedCategory: String?,
-        //sortOption
+        val sortOption: SortOption
     ) : ProductListUiState()
 
 }
