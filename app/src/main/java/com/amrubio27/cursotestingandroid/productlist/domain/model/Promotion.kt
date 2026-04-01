@@ -1,6 +1,6 @@
 package com.amrubio27.cursotestingandroid.productlist.domain.model
 
-import kotlin.time.Instant
+import java.time.Instant
 
 enum class PromotionType {
     PERCENT,
