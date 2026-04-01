@@ -1,15 +1,19 @@
 package com.amrubio27.cursotestingandroid.productlist.presentation
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -26,6 +30,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amrubio27.cursotestingandroid.productlist.domain.model.Product
+import com.amrubio27.cursotestingandroid.productlist.presentation.components.FiltersMenu
+import com.amrubio27.cursotestingandroid.productlist.presentation.components.HomeTopAppBar
+import com.amrubio27.cursotestingandroid.productlist.presentation.components.ProductItem
 
 @Composable
 fun ProductListScreen(
@@ -34,6 +41,8 @@ fun ProductListScreen(
 ) {
     val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val filtersVisible by productListViewModel.filtersVisible.collectAsStateWithLifecycle()
+
 
 
     LaunchedEffect(Unit) {
@@ -48,6 +57,12 @@ fun ProductListScreen(
 
     Scaffold(
         modifier = modifier,
+        topBar = {
+            HomeTopAppBar(
+                filtersVisible = filtersVisible,
+                onFilterSelected = { showFilter -> productListViewModel.setFilterVisible(showFilter) },
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         when (val state = uiState) {
@@ -83,16 +98,54 @@ fun ProductListScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    LazyColumn {
-                        items(state.products) { product: Product ->
-                            Box(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .height(50.dp)
-                                    .background(Color.Red),
-                                contentAlignment = Alignment.Center
+                    AnimatedVisibility(
+                        visible = filtersVisible,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        FiltersMenu(
+                            state = state,
+                            onCategorySelected = { category ->
+                                productListViewModel.setCategory(
+                                    category
+                                )
+                            },
+                            onSortSelected = { sortOption ->
+                                productListViewModel.setSortOption(
+                                    sortOption
+                                )
+                            })
+                    }
+
+                    Text(
+                        "${state.products.size} productos",
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    if (state.products.isEmpty()) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text(product.name)
+                                Text("🔍", style = MaterialTheme.typography.displayMedium)
+                                Text(
+                                    "No se encontraron productos",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.tertiary
+                                )
+                            }
+                        }
+                    } else {
+                        LazyColumn {
+                            items(state.products) { product: Product ->
+                                ProductItem(product = product, onClick = {})
                             }
                         }
                     }
