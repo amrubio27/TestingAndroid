@@ -1,5 +1,10 @@
 package com.amrubio27.cursotestingandroid.productlist.presentation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +31,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amrubio27.cursotestingandroid.productlist.domain.model.Product
 import com.amrubio27.cursotestingandroid.productlist.presentation.components.FiltersMenu
+import com.amrubio27.cursotestingandroid.productlist.presentation.components.HomeTopAppBar
 import com.amrubio27.cursotestingandroid.productlist.presentation.components.ProductItem
 
 @Composable
@@ -35,6 +41,8 @@ fun ProductListScreen(
 ) {
     val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val filtersVisible by productListViewModel.filtersVisible.collectAsStateWithLifecycle()
+
 
 
     LaunchedEffect(Unit) {
@@ -49,6 +57,12 @@ fun ProductListScreen(
 
     Scaffold(
         modifier = modifier,
+        topBar = {
+            HomeTopAppBar(
+                filtersVisible = filtersVisible,
+                onFilterSelected = { showFilter -> productListViewModel.setFilterVisible(showFilter) },
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         when (val state = uiState) {
@@ -84,14 +98,25 @@ fun ProductListScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    FiltersMenu(
-                        state = state,
-                        onCategorySelected = { category -> productListViewModel.setCategory(category) },
-                        onSortSelected = { sortOption ->
-                            productListViewModel.setSortOption(
-                                sortOption
-                            )
-                        })
+                    AnimatedVisibility(
+                        visible = filtersVisible,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        FiltersMenu(
+                            state = state,
+                            onCategorySelected = { category ->
+                                productListViewModel.setCategory(
+                                    category
+                                )
+                            },
+                            onSortSelected = { sortOption ->
+                                productListViewModel.setSortOption(
+                                    sortOption
+                                )
+                            })
+                    }
+
                     Text(
                         "${state.products.size} productos",
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
