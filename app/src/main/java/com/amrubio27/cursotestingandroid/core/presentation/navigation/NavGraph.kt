@@ -2,22 +2,21 @@ package com.amrubio27.cursotestingandroid.core.presentation.navigation
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavGraph
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.amrubio27.cursotestingandroid.productlist.presentation.ProductListScreen
 
 @Composable
 fun NavGraph() {
     val backStack: NavBackStack<NavKey> = rememberNavBackStack(Screen.ProductList)
     val entries: (NavKey) -> NavEntry<NavKey> = entryProvider<NavKey> {
         entry<Screen.ProductList> {
-            Text("ProductList", fontSize = 30.sp)
+            ProductListScreen()
         }
         entry<Screen.Cart> {
             Text("Cart", fontSize = 30.sp)
