@@ -1,4 +1,4 @@
-package com.amrubio27.cursotestingandroid.detail
+package com.amrubio27.cursotestingandroid.detail.presentation
 
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 
