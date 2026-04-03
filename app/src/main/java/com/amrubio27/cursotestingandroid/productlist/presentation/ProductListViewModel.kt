@@ -2,24 +2,31 @@ package com.amrubio27.cursotestingandroid.productlist.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromotion
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
+import com.amrubio27.cursotestingandroid.productlist.domain.repository.SettingsRepository
 import com.amrubio27.cursotestingandroid.productlist.domain.usecase.GetProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
-    private val getProductsUseCase: GetProductsUseCase
+    private val getProductsUseCase: GetProductsUseCase,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ProductListUiState>(ProductListUiState.Loading)
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
@@ -27,9 +34,13 @@ class ProductListViewModel @Inject constructor(
     private val _events = MutableSharedFlow<ProductListEvent>(extraBufferCapacity = 1)
     val events: SharedFlow<ProductListEvent> = _events
 
-    private val _filtersVisible = MutableStateFlow<Boolean>(true)
-    val filtersVisible: StateFlow<Boolean> = _filtersVisible.asStateFlow()
+    val filtersVisible: StateFlow<Boolean> = settingsRepository.filtersVisible.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
 
+    private var productsJob: Job? = null
 
     init {
         loadProducts()
@@ -37,39 +48,78 @@ class ProductListViewModel @Inject constructor(
 
     fun loadProducts() {
         _uiState.value = ProductListUiState.Loading
-        getProductsUseCase()
-            .onEach { products: List<ProductWithPromotion> ->
-                val categories = products.map { it.product.category }.distinct().sorted()
-                _uiState.value =
-                    ProductListUiState.Success(
-                        products = products,
-                        categories = categories,
-                        selectedCategory = null,
-                        sortOption = SortOption.NONE
+        productsJob?.cancel()
+        productsJob = combine(
+            getProductsUseCase(),
+            settingsRepository.selectedCategory,
+            settingsRepository.sortOption
+        ) { products, selectedCategory, sortOption ->
+            var filteredProducts = products
+            if (selectedCategory != null) {
+                filteredProducts =
+                    filteredProducts.filter { it.product.category == selectedCategory }
+            }
+
+            val sorted = when (sortOption) {
+                SortOption.NONE -> filteredProducts
+                SortOption.PRICE_ASC -> filteredProducts.sortedBy { effecticePrice(it) }
+                SortOption.PRICE_DESC -> filteredProducts.sortedByDescending { effecticePrice(it) }
+                SortOption.DISCOUNT ->
+                    //filteredProducts.sortedByDescending { effectiveDiscountPercent(it) }
+                    filteredProducts.sortedWith(
+                        compareByDescending<ProductWithPromotion> {
+                            effectiveDiscountPercent(it)
+                        }.thenBy {
+                            it.promotion == null
+                        }
                     )
             }
-            .catch { exception: Throwable ->
-                _uiState.value = ProductListUiState.Error(exception.message.orEmpty())
-            }
-            .launchIn(viewModelScope)
 
+            val categories = products.map { it.product.category }.distinct().sorted()
+
+            ProductListUiState.Success(
+                products = sorted,
+                categories = categories,
+                selectedCategory = selectedCategory,
+                sortOption = sortOption
+            )
+        }.onEach { state ->
+            _uiState.value = state
+        }.catch { exception: Throwable ->
+            _uiState.value = ProductListUiState.Error(exception.message.orEmpty())
+        }.launchIn(viewModelScope)
     }
 
     fun setCategory(category: String?) {
         viewModelScope.launch {
-            //llamar al settingsRepository
+            settingsRepository.setSelectedCategory(category)
         }
     }
 
     fun setSortOption(sortOption: SortOption) {
         viewModelScope.launch {
-            //llamar al settingsRepository
+            settingsRepository.setSortOption(sortOption)
         }
     }
 
     fun setFilterVisible(showFilter: Boolean) {
         viewModelScope.launch {
-            _filtersVisible.value = showFilter
+            settingsRepository.setFiltersVisible(showFilter)
         }
     }
+
+    private fun effectiveDiscountPercent(item: ProductWithPromotion): Double {
+        return when (val promo = item.promotion) {
+            is ProductPromotion.Percent -> promo.percent
+            else -> 0.0
+        }
+    }
+
+    private fun effecticePrice(item: ProductWithPromotion): Double {
+        return when (val promo = item.promotion) {
+            is ProductPromotion.Percent -> promo.discountPrice
+            else -> item.product.price
+        }
+    }
+
 }

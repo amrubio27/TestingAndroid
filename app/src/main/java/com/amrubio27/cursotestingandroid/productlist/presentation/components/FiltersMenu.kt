@@ -93,7 +93,7 @@ fun FiltersMenu(
 
                 FilterChip(
                     selected = state.sortOption == SortOption.DISCOUNT,
-                    onClick = { onSortSelected(SortOption.NONE) },
+                    onClick = { onSortSelected(SortOption.DISCOUNT) },
                     label = { Text("Descuento", style = MaterialTheme.typography.labelSmall) },
                     modifier = Modifier.weight(1f)
                 )
