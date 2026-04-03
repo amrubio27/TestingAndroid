@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 fun HomeTopAppBar(
     modifier: Modifier = Modifier,
     filtersVisible: Boolean = true,
-    onFilterSelected: (Boolean) -> Unit = {},
+    onFilterSelected: (Boolean) -> Unit,
     onSettingsSelected: () -> Unit = {}
 ) {
     TopAppBar(

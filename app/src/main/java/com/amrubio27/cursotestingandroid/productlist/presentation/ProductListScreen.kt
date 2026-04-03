@@ -37,7 +37,8 @@ import com.amrubio27.cursotestingandroid.productlist.presentation.components.Pro
 @Composable
 fun ProductListScreen(
     modifier: Modifier = Modifier,
-    productListViewModel: ProductListViewModel = hiltViewModel()
+    productListViewModel: ProductListViewModel = hiltViewModel(),
+    navigateToSettings: () -> Unit
 ) {
     val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -59,6 +60,7 @@ fun ProductListScreen(
             HomeTopAppBar(
                 filtersVisible = filtersVisible,
                 onFilterSelected = { showFilter -> productListViewModel.setFilterVisible(showFilter) },
+                onSettingsSelected = { navigateToSettings() }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
