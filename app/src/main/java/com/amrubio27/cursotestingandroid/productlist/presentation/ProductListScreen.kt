@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.amrubio27.cursotestingandroid.cart.presentation.CartUiState
+import com.amrubio27.cursotestingandroid.cart.presentation.CartViewModel
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 import com.amrubio27.cursotestingandroid.productlist.presentation.components.FiltersMenu
 import com.amrubio27.cursotestingandroid.productlist.presentation.components.HomeTopAppBar
@@ -37,12 +39,14 @@ import com.amrubio27.cursotestingandroid.productlist.presentation.components.Pro
 @Composable
 fun ProductListScreen(
     modifier: Modifier = Modifier,
+    cartViewModel: CartViewModel = hiltViewModel(),
     productListViewModel: ProductListViewModel = hiltViewModel(),
     navigateToSettings: () -> Unit,
     navigateToProductDetail: (String) -> Unit,
     navigateToCart: () -> Unit
 ) {
     val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
+    val cartUiState by cartViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val filtersVisible by productListViewModel.filtersVisible.collectAsStateWithLifecycle()
 
@@ -56,6 +60,16 @@ fun ProductListScreen(
         }
     }
 
+    val cartItemCount = remember(cartUiState) {
+        when (val state = cartUiState) {
+            is CartUiState.Success -> {
+                state.cartItems.sumOf { it.cartItem.quantity }
+            }
+
+            else -> 0
+        }
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -63,7 +77,8 @@ fun ProductListScreen(
                 filtersVisible = filtersVisible,
                 onFilterSelected = { showFilter -> productListViewModel.setFilterVisible(showFilter) },
                 onSettingsSelected = { navigateToSettings() },
-                onCartSelected = { navigateToCart() }
+                onCartSelected = { navigateToCart() },
+                cartItemCount = cartItemCount
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
