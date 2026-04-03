@@ -38,7 +38,8 @@ import com.amrubio27.cursotestingandroid.productlist.presentation.components.Pro
 fun ProductListScreen(
     modifier: Modifier = Modifier,
     productListViewModel: ProductListViewModel = hiltViewModel(),
-    navigateToSettings: () -> Unit
+    navigateToSettings: () -> Unit,
+    navigateToProductDetail: (String) -> Unit
 ) {
     val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -145,7 +146,11 @@ fun ProductListScreen(
                     } else {
                         LazyColumn {
                             items(state.products) { item: ProductWithPromotion ->
-                                ProductItem(item = item, onClick = {})
+                                ProductItem(
+                                    item = item,
+                                    onClick = {
+                                        navigateToProductDetail(item.product.id)
+                                    })
                             }
                         }
                     }

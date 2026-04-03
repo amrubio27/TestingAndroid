@@ -20,4 +20,6 @@ class LocalDataSource @Inject constructor(
     suspend fun savePromotions(promotions: List<PromotionEntity>) =
         promotionDao.replaceAll(promotions)
 
+    fun getProductById(id: String): Flow<ProductEntity?> = productDao.getProductById(id)
+
 }
