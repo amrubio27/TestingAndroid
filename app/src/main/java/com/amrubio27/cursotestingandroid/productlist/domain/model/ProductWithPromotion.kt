@@ -8,7 +8,7 @@ data class ProductWithPromotion(
 sealed interface ProductPromotion {
     data class Percent(
         val percent: Double,
-        val discountPrice: Double
+        val discountedPrice: Double
     ) : ProductPromotion
 
     data class BuyXPayY(
