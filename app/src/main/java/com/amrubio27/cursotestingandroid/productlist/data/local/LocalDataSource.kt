@@ -7,6 +7,7 @@ import com.amrubio27.cursotestingandroid.productlist.data.local.database.dao.Pro
 import com.amrubio27.cursotestingandroid.productlist.data.local.database.entity.ProductEntity
 import com.amrubio27.cursotestingandroid.productlist.data.local.database.entity.PromotionEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class LocalDataSource @Inject constructor(
@@ -24,6 +25,13 @@ class LocalDataSource @Inject constructor(
         promotionDao.replaceAll(promotions)
 
     fun getProductById(id: String): Flow<ProductEntity?> = productDao.getProductById(id)
+
+    fun getProductsByIds(productsIds: Set<String>): Flow<List<ProductEntity>> =
+        if (productsIds.isEmpty()) {
+            flowOf(emptyList())
+        } else {
+            productDao.getProductsByIds(productsIds.toList())
+        }
 
     fun getAllCartItems(): Flow<List<CartItemEntity>> = cartItemDao.getAllCartItems()
 

@@ -27,4 +27,7 @@ interface ProductDao {
         clearProducts()
         insertAllProducts(products)
     }
+
+    @Query("SELECT * FROM products WHERE id IN (:productIds)")
+    fun getProductsByIds(productIds: List<String>): Flow<List<ProductEntity>>
 }

@@ -70,4 +70,13 @@ class ProductRepositoryImpl @Inject constructor(
 
         }
     }
+
+    override fun getProductsByIds(ids: Set<String>): Flow<List<Product>> {
+        return localDataSource.getProductsByIds(ids)
+            .map { entities ->
+                entities.mapNotNull {
+                    it.toDomain()
+                }
+            }
+    }
 }
