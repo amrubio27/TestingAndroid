@@ -49,7 +49,7 @@ class CartViewModel @Inject constructor(
         _uiState.value = CartUiState.Loading
         cartJob?.cancel()
 
-        cartItemRepository.getCartItems().flatMapLatest { cartItems ->
+        cartJob = cartItemRepository.getCartItems().flatMapLatest { cartItems ->
             val ids = cartItems.mapTo(mutableSetOf()) { it.productId }
             if (ids.isNotEmpty()) {
                 getCartSummaryUseCase().map { summary ->
@@ -78,7 +78,7 @@ class CartViewModel @Inject constructor(
             }
 
         }.catch { e ->
-            _events.emit(CartEvent.ShowMessage(e.message.orEmpty()))
+            _uiState.value = CartUiState.Error(e.message.orEmpty())
         }.launchIn(viewModelScope)
 
         /*cartJob = combine(

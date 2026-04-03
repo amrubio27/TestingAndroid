@@ -39,7 +39,8 @@ fun ProductListScreen(
     modifier: Modifier = Modifier,
     productListViewModel: ProductListViewModel = hiltViewModel(),
     navigateToSettings: () -> Unit,
-    navigateToProductDetail: (String) -> Unit
+    navigateToProductDetail: (String) -> Unit,
+    navigateToCart: () -> Unit
 ) {
     val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -61,7 +62,8 @@ fun ProductListScreen(
             HomeTopAppBar(
                 filtersVisible = filtersVisible,
                 onFilterSelected = { showFilter -> productListViewModel.setFilterVisible(showFilter) },
-                onSettingsSelected = { navigateToSettings() }
+                onSettingsSelected = { navigateToSettings() },
+                onCartSelected = { navigateToCart() }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

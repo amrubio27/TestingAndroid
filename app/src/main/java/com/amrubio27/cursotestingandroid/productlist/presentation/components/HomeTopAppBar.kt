@@ -3,6 +3,7 @@ package com.amrubio27.cursotestingandroid.productlist.presentation.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,7 +21,8 @@ fun HomeTopAppBar(
     modifier: Modifier = Modifier,
     filtersVisible: Boolean = true,
     onFilterSelected: (Boolean) -> Unit,
-    onSettingsSelected: () -> Unit = {}
+    onSettingsSelected: () -> Unit = {},
+    onCartSelected: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -49,6 +51,15 @@ fun HomeTopAppBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+            IconButton(
+                onClick = { onCartSelected() }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
