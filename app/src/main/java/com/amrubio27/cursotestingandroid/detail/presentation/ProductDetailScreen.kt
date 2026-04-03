@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.amrubio27.cursotestingandroid.R
 import com.amrubio27.cursotestingandroid.core.presentation.components.MarketTopAppBar
+import com.amrubio27.cursotestingandroid.detail.presentation.components.AddToCartButton
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromotion
 
 @Composable
@@ -56,9 +59,17 @@ fun ProductDetailScreen(
         MarketTopAppBar(
             title = uiState.item?.product?.name.orEmpty(), onBackSelected = { onBack() })
     }, bottomBar = {
-        /*AddToCartButton(
-            product = uiState.item?.product, isLoading = uiState.isLoading
-        ) { productDetailViewModel.addToCart() }*/
+        BottomAppBar(
+            windowInsets = BottomAppBarDefaults.windowInsets
+        ) {
+            AddToCartButton(
+                modifier = Modifier.weight(1f),
+                product = uiState.item?.product,
+                isLoading = uiState.isLoading
+            ) {
+                productDetailViewModel.addToCart()
+            }
+        }
     }, snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
         Column(
             modifier = Modifier
