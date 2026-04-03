@@ -156,7 +156,7 @@ fun ProductItem(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 Text(
-                                    "$${promotion.discountPrice.toPriceAmount()}",
+                                    "$${promotion.discountedPrice.toPriceAmount()}",
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold

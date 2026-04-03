@@ -117,7 +117,7 @@ class ProductListViewModel @Inject constructor(
 
     private fun effecticePrice(item: ProductWithPromotion): Double {
         return when (val promo = item.promotion) {
-            is ProductPromotion.Percent -> promo.discountPrice
+            is ProductPromotion.Percent -> promo.discountedPrice
             else -> item.product.price
         }
     }
