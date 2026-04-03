@@ -23,13 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration.Companion.LineThrough
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.amrubio27.cursotestingandroid.core.presentation.ext.toPriceAmount
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromotion
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
+import java.util.Locale
 
 @Composable
 fun ProductItem(
@@ -46,11 +46,11 @@ fun ProductItem(
     }
 
     Card(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 16.dp)
             .clickable { onClick(item) },
-        elevation = CardDefaults.cardElevation(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
@@ -60,6 +60,7 @@ fun ProductItem(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
             Box(
                 modifier = Modifier
                     .size(88.dp)
@@ -85,16 +86,16 @@ fun ProductItem(
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopStart)
+                            .padding(6.dp)
                             .background(
-                                color = MaterialTheme.colorScheme.error,
-                                shape = RoundedCornerShape(4.dp)
+                                MaterialTheme.colorScheme.error, shape = RoundedCornerShape(4.dp)
                             )
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
-                            text = promoBadge,
+                            promoBadge,
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onPrimary,
+                            color = MaterialTheme.colorScheme.onError,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -102,12 +103,12 @@ fun ProductItem(
             }
 
             Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
                     text = product.name,
                     style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -117,19 +118,20 @@ fun ProductItem(
                     Text(
                         text = product.description,
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+
                     if (promotion is ProductPromotion.Percent) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -140,10 +142,10 @@ fun ProductItem(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    "$${product.price.toPriceAmount()}",
+                                    String.format(Locale.getDefault(), "%.2f", product.price),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textDecoration = LineThrough
+                                    textDecoration = TextDecoration.LineThrough
                                 )
                             }
                             Row(
@@ -156,7 +158,11 @@ fun ProductItem(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 Text(
-                                    "$${promotion.discountedPrice.toPriceAmount()}",
+                                    String.format(
+                                        Locale.getDefault(),
+                                        "%.2f",
+                                        promotion.discountedPrice
+                                    ),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold
@@ -165,12 +171,15 @@ fun ProductItem(
                         }
                     } else {
                         Text(
-                            text = "$${product.price.toPriceAmount()}",
+                            text = String.format(Locale.getDefault(), "%.2f", product.price),
                             style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
                         )
                     }
                 }
+
+
             }
         }
     }
