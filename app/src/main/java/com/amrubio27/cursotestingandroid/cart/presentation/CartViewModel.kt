@@ -51,7 +51,7 @@ class CartViewModel @Inject constructor(
 
         cartJob = cartItemRepository.getCartItems().flatMapLatest { cartItems ->
             val ids = cartItems.mapTo(mutableSetOf()) { it.productId }
-            if (ids.isNotEmpty()) {
+            if (ids.isEmpty()) {
                 getCartSummaryUseCase().map { summary ->
                     _uiState.value = CartUiState.Success(
                         summary = summary, cartItems = emptyList(), isLoading = false
