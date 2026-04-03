@@ -99,6 +99,11 @@ fun SettingsScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
+
+                        Switch(
+                            checked = true,
+                            onCheckedChange = { }
+                        )
                     }
 
                     HorizontalDivider()
