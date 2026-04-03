@@ -3,10 +3,9 @@ package com.amrubio27.cursotestingandroid.cart.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amrubio27.cursotestingandroid.cart.domain.repository.CartItemRepository
+import com.amrubio27.cursotestingandroid.cart.domain.usecase.GetCartItemsWithPromotionsUseCase
 import com.amrubio27.cursotestingandroid.cart.domain.usecase.GetCartSummaryUseCase
 import com.amrubio27.cursotestingandroid.cart.domain.usecase.UpdateCartItemUseCase
-import com.amrubio27.cursotestingandroid.cart.presentation.model.CartItemWithPromotion
-import com.amrubio27.cursotestingandroid.productlist.domain.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -17,9 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,8 +26,7 @@ class CartViewModel @Inject constructor(
     private val cartItemRepository: CartItemRepository,
     private val getCartSummaryUseCase: GetCartSummaryUseCase,
     private val updateCartItemUseCase: UpdateCartItemUseCase,
-    private val productRepository: ProductRepository,
-    //private val getCartItemsWithPromotionsUseCase: GetCartItemsWithPromotionsUseCase
+    private val getCartItemsWithPromotionsUseCase: GetCartItemsWithPromotionsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CartUiState>(CartUiState.Loading)
@@ -49,39 +45,7 @@ class CartViewModel @Inject constructor(
         _uiState.value = CartUiState.Loading
         cartJob?.cancel()
 
-        cartJob = cartItemRepository.getCartItems().flatMapLatest { cartItems ->
-            val ids = cartItems.mapTo(mutableSetOf()) { it.productId }
-            if (ids.isEmpty()) {
-                getCartSummaryUseCase().map { summary ->
-                    _uiState.value = CartUiState.Success(
-                        summary = summary, cartItems = emptyList(), isLoading = false
-                    )
-                }
-            } else {
-                combine(
-                    productRepository.getProductsByIds(ids),
-                    getCartSummaryUseCase()
-                ) { products, summary ->
-                    val productsById = products.associateBy { it.id }
-                    val cartItemsWithProducts = cartItems.mapNotNull { cartItem ->
-                        val finalProduct =
-                            productsById[cartItem.productId] ?: return@mapNotNull null
-                        CartItemWithPromotion(
-                            product = finalProduct,
-                            cartItem = cartItem
-                        )
-                    }
-                    _uiState.value = CartUiState.Success(
-                        summary = summary, cartItems = cartItemsWithProducts, isLoading = false
-                    )
-                }
-            }
-
-        }.catch { e ->
-            _uiState.value = CartUiState.Error(e.message.orEmpty())
-        }.launchIn(viewModelScope)
-
-        /*cartJob = combine(
+        cartJob = combine(
             getCartItemsWithPromotionsUseCase(), getCartSummaryUseCase()
         ) { cartItemWithPromotion, summary ->
             _uiState.value = CartUiState.Success(
@@ -90,7 +54,7 @@ class CartViewModel @Inject constructor(
         }.catch { e ->
             _events.emit(CartEvent.ShowMessage(e.message.orEmpty()))
 
-        }.launchIn(viewModelScope)*/
+        }.launchIn(viewModelScope)
     }
 
 
