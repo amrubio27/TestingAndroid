@@ -1,7 +1,8 @@
 package com.amrubio27.cursotestingandroid.detail.presentation
 
 sealed interface ProductDetailEvent {
-
-    data class ShowMessage(val msg: String) : ProductDetailEvent
-    data class ShowError(val msg: String?) : ProductDetailEvent
+    data object UNKNOWN_ERROR : ProductDetailEvent
+    data object NETWORK_ERROR : ProductDetailEvent
+    data object INSUFFICIENT_STOCK_ERROR : ProductDetailEvent
+    data object SUCCESS_ADD_TO_CART : ProductDetailEvent
 }

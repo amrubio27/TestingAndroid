@@ -55,6 +55,28 @@ fun ProductDetailScreen(
         productDetailViewModel.loadProduct(productId)
     }
 
+    LaunchedEffect(Unit) {
+        productDetailViewModel.events.collect { event ->
+            when (event) {
+                ProductDetailEvent.INSUFFICIENT_STOCK_ERROR -> {
+                    snackbarHostState.showSnackbar("No hay suficiente stock")
+                }
+
+                ProductDetailEvent.NETWORK_ERROR -> {
+                    snackbarHostState.showSnackbar("No hay internet, compruebe su conexión")
+                }
+
+                ProductDetailEvent.UNKNOWN_ERROR -> {
+                    snackbarHostState.showSnackbar("Error inesperado, vuelva a intentarlo")
+                }
+
+                ProductDetailEvent.SUCCESS_ADD_TO_CART -> {
+                    snackbarHostState.showSnackbar("Producto añadido")
+                }
+            }
+        }
+    }
+
     Scaffold(topBar = {
         MarketTopAppBar(
             title = uiState.item?.product?.name.orEmpty(), onBackSelected = { onBack() })
