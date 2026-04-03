@@ -196,27 +196,25 @@ fun SettingsScreen(
                             SegmentedButton(
                                 shape = SegmentedButtonDefaults.itemShape(0, 3),
                                 onClick = { settingsViewModel.setThemeMode(ThemeMode.SYSTEM) },
-                                selected = false,
+                                selected = uiState.themeMode == ThemeMode.SYSTEM,
                                 label = { Text("Sistema") }
                             )
                             SegmentedButton(
                                 shape = SegmentedButtonDefaults.itemShape(1, 3),
                                 onClick = { settingsViewModel.setThemeMode(ThemeMode.LIGHT) },
-                                selected = false,
+                                selected = uiState.themeMode == ThemeMode.LIGHT,
                                 label = { Text("Claro") }
                             )
                             SegmentedButton(
                                 shape = SegmentedButtonDefaults.itemShape(2, 3),
                                 onClick = { settingsViewModel.setThemeMode(ThemeMode.DARK) },
-                                selected = false,
+                                selected = uiState.themeMode == ThemeMode.DARK,
                                 label = { Text("Oscuro") }
                             )
                         }
                     }
-
                 }
             }
         }
     }
-
 }
