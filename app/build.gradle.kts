@@ -98,7 +98,11 @@ dependencies {
     //Serialization
     implementation(libs.kotlinx.serialization.json)
 
+    //UnitTest
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    //IntegrationTest
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
