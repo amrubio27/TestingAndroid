@@ -311,17 +311,14 @@ fun CartItemCard(
     onDecreaseQuantity: (String, Int) -> Unit,
     onRemove: (String) -> Unit
 ) {
-    val product = itemWithProduct.product
-    val promotion = itemWithProduct.cartItem
+    val product = itemWithProduct.item.product
+    val promotion = itemWithProduct.item.promotion
     val cartItem = itemWithProduct.cartItem
 
     val unitPrice = when (promotion) {
         is ProductPromotion.Percent -> promotion.discountedPrice
         is ProductPromotion.BuyXPayY -> product.price
         null -> product.price
-        else -> {
-            product.price
-        }
     }
 
     val hasDiscount = promotion is ProductPromotion.Percent
