@@ -5,6 +5,7 @@ import com.amrubio27.cursotestingandroid.core.domain.model.AppError
 import com.amrubio27.cursotestingandroid.core.fakes.FakeCartItemRepository
 import com.amrubio27.cursotestingandroid.core.fakes.FakeProductRepository
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -75,5 +76,52 @@ class AddToCartUseCaseTest {
         //then
         assert(exception is AppError.Validation.InsufficientStock)
         assertEquals(2, (exception as AppError.Validation.InsufficientStock).available)
+    }
+
+    @Test
+    fun succesfull_case_add_item_to_cart() = runTest {
+        //Given
+        val productId = "id-test-1"
+        val product = product {
+            withId(productId)
+            withStock(10)
+        }
+        val cartItemRepository = FakeCartItemRepository()
+        val productRepository = FakeProductRepository().apply {
+            setProducts(listOf(product))
+        }
+        val useCase = AddToCartUseCase(cartItemRepository, productRepository)
+
+        //when
+        useCase(productId, 3)
+
+        //then
+        val items = cartItemRepository.getCartItems().first()
+        assertEquals(productId, items.first().productId)
+        assertEquals(1, items.size)
+        assertEquals(3, items.first().quantity)
+    }
+
+    @Test
+    fun default_quantity_adds_one_item() = runTest {
+        //Given
+        val productId = "id-test-1"
+        val product = product {
+            withId(productId)
+            withStock(10)
+        }
+        val cartItemRepository = FakeCartItemRepository()
+        val productRepository = FakeProductRepository().apply {
+            setProducts(listOf(product))
+        }
+        val useCase = AddToCartUseCase(cartItemRepository, productRepository)
+
+        //when
+        useCase(productId)
+
+        //then
+        val items = cartItemRepository.getCartItems().first()
+        assertEquals(1, items.size)
+        assertEquals(1, items.first().quantity)
     }
 }
