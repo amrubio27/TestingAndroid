@@ -101,6 +101,8 @@ dependencies {
     //UnitTest
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+
 
     //IntegrationTest
     androidTestImplementation(libs.androidx.junit)
