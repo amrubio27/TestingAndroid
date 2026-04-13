@@ -10,6 +10,10 @@ import kotlinx.coroutines.flow.asStateFlow
 class FakeCartItemRepository : CartItemRepository {
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
 
+    fun setCartItems(cartItems: List<CartItem>) {
+        _cartItems.value = cartItems
+    }
+
     override fun getCartItems(): Flow<List<CartItem>> = _cartItems.asStateFlow()
 
     override suspend fun addToCart(productId: String, quantity: Int) {
