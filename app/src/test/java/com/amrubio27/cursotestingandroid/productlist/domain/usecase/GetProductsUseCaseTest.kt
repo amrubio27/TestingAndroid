@@ -35,7 +35,7 @@ class GetProductsUseCaseTest {
             withId(productId)
         }
         val promo = promotion {
-            withProductsId(listOf(productId))
+            withProductIds(listOf(productId))
             withStartTime(now.minusSeconds(60))
             withEndTime(now)
         }
@@ -71,7 +71,7 @@ class GetProductsUseCaseTest {
                 withId(productId)
             }
             val promo = promotion {
-                withProductsId(listOf(productId))
+                withProductIds(listOf(productId))
                 withStartTime(now.minusSeconds(1))
                 withEndTime(now.plusSeconds(5))
             }
