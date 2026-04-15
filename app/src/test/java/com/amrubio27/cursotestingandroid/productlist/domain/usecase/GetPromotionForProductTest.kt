@@ -34,7 +34,7 @@ class GetPromotionForProductTest {
         }
         val promotion = promotion {
             withType(PromotionType.PERCENT)
-            withProductsId(listOf(productId))
+            withProductIds(listOf(productId))
             withValue(15.0)
         }
 
@@ -59,12 +59,12 @@ class GetPromotionForProductTest {
         }
         val promotionPercent = promotion {
             withType(PromotionType.PERCENT)
-            withProductsId(listOf(productId))
+            withProductIds(listOf(productId))
             withValue(15.0)
         }
         val promotionBuyXPayY = promotion {
             withType(PromotionType.BUY_X_PAY_Y)
-            withProductsId(listOf(productId))
+            withProductIds(listOf(productId))
             withBuyQuantity(3)
             withValue(2.0)
 
@@ -91,12 +91,12 @@ class GetPromotionForProductTest {
         }
         val promotionLow = promotion {
             withType(PromotionType.PERCENT)
-            withProductsId(listOf(productId))
+            withProductIds(listOf(productId))
             withValue(5.0)
         }
         val promotionHigh = promotion {
             withType(PromotionType.PERCENT)
-            withProductsId(listOf(productId))
+            withProductIds(listOf(productId))
             withValue(50.0)
         }
 
@@ -118,12 +118,12 @@ class GetPromotionForProductTest {
         }
         val promotionLow = promotion {
             withType(PromotionType.PERCENT)
-            withProductsId(listOf(productId))
+            withProductIds(listOf(productId))
             withValue(5.0)
         }
         val brokenBuyXPromotion = promotion {
             withType(PromotionType.BUY_X_PAY_Y)
-            withProductsId(listOf(productId))
+            withProductIds(listOf(productId))
             withBuyQuantity(null)
         }
         //When
