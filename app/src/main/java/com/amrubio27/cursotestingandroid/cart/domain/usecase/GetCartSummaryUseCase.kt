@@ -4,6 +4,7 @@ import com.amrubio27.cursotestingandroid.cart.domain.ex.activeAt
 import com.amrubio27.cursotestingandroid.cart.domain.model.CartItem
 import com.amrubio27.cursotestingandroid.cart.domain.model.CartSummary
 import com.amrubio27.cursotestingandroid.cart.domain.repository.CartItemRepository
+import com.amrubio27.cursotestingandroid.core.domain.util.Clock
 import com.amrubio27.cursotestingandroid.productlist.domain.model.Product
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromotion
 import com.amrubio27.cursotestingandroid.productlist.domain.model.Promotion
@@ -15,14 +16,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import java.time.Instant
 import javax.inject.Inject
 
 class GetCartSummaryUseCase @Inject constructor(
     private val cartItemRepository: CartItemRepository,
     private val productRepository: ProductRepository,
     private val promotionRepository: PromotionRepository,
-    private val getPromotionForProduct: GetPromotionForProduct
+    private val getPromotionForProduct: GetPromotionForProduct,
+    private val clock: Clock
 ) {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -37,7 +38,7 @@ class GetCartSummaryUseCase @Inject constructor(
                         productRepository.getProductsByIds(ids),
                         promotionRepository.getActivePromotions()
                     ) { products, promotions ->
-                        calculateSummary(cartItems, products, promotions)
+                        calculateSummary(cartItems, products, promotions, clock)
                     }
                 }
             }
@@ -46,9 +47,10 @@ class GetCartSummaryUseCase @Inject constructor(
     private fun calculateSummary(
         cartItems: List<CartItem>,
         products: List<Product>,
-        promotions: List<Promotion>
+        promotions: List<Promotion>,
+        clock: Clock
     ): CartSummary {
-        val now = Instant.now()
+        val now = clock.now()
         val activePromotions = promotions.activeAt(now)
 
         val productsById = products.associateBy { it.id }
