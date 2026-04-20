@@ -7,6 +7,7 @@ import com.amrubio27.cursotestingandroid.core.fakes.FakeProductRepository
 import com.amrubio27.cursotestingandroid.core.fakes.FakePromotionRepository
 import com.amrubio27.cursotestingandroid.core.fakes.FakeSettingsRepository
 import com.amrubio27.cursotestingandroid.core.fakes.FakeSystemClock
+import com.amrubio27.cursotestingandroid.core.stubs.FailingProductRepositoryStub
 import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
 import com.amrubio27.cursotestingandroid.productlist.domain.repository.ProductRepository
 import com.amrubio27.cursotestingandroid.productlist.domain.usecase.GetProductsUseCase
@@ -104,6 +105,25 @@ class ProductListViewModelTest {
                 assertEquals(15.0, state.products[0].product.price, 0.0)
                 assertEquals(30.0, state.products[1].product.price, 0.0)
                 assertEquals(SortOption.PRICE_ASC, state.sortOption)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `given repository error when loading products then emits error state`() =
+        runTest(mainDispatcherRule.scheduler) {
+
+            val failingRepository = FailingProductRepositoryStub(Exception("Prueba test"))
+
+
+            val viewModel = createViewModel(fakeProduct = failingRepository)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+
+                assertTrue(state is ProductListUiState.Error)
+                assertTrue((state as ProductListUiState.Error).message == "Prueba test")
 
                 cancelAndIgnoreRemainingEvents()
             }
