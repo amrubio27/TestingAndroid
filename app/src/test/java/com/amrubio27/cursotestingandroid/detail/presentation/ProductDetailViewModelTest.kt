@@ -90,12 +90,19 @@ class ProductDetailViewModelTest {
             fakeProduct.setProducts(listOf(p))
             val viewModel = createViewModel()
 
-            viewModel.loadProduct("1")
+            viewModel.uiState.test {
+                awaitItem() // initial
+                viewModel.loadProduct("1")
+                val loaded = awaitItem()
+                assertEquals("1", loaded.item?.product?.id)
 
-            viewModel.events.test {
-                viewModel.addToCart()
-                val result = awaitItem()
-                assertEquals(ProductDetailEvent.SUCCESS_ADD_TO_CART, result)
+                viewModel.events.test {
+                    viewModel.addToCart()
+                    val result = awaitItem()
+                    assertEquals(ProductDetailEvent.SUCCESS_ADD_TO_CART, result)
+                    cancelAndIgnoreRemainingEvents()
+                }
+
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -107,15 +114,21 @@ class ProductDetailViewModelTest {
             fakeProduct.setProducts(listOf(p))
             val viewModel = createViewModel()
 
-            viewModel.loadProduct("1")
+            viewModel.uiState.test {
+                awaitItem() // initial
+                viewModel.loadProduct("1")
+                val loaded = awaitItem()
+                assertEquals("1", loaded.item?.product?.id)
 
-            viewModel.events.test {
-                viewModel.addToCart()
-                val result = awaitItem()
-                assertEquals(ProductDetailEvent.INSUFFICIENT_STOCK_ERROR, result)
+                viewModel.events.test {
+                    viewModel.addToCart()
+                    val result = awaitItem()
+                    assertEquals(ProductDetailEvent.INSUFFICIENT_STOCK_ERROR, result)
+                    cancelAndIgnoreRemainingEvents()
+                }
+
                 cancelAndIgnoreRemainingEvents()
             }
-
         }
 
 
