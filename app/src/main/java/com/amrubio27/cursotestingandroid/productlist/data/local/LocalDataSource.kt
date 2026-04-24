@@ -15,7 +15,7 @@ class LocalDataSource @Inject constructor(
     private val promotionDao: PromotionDao,
     private val cartItemDao: CartItemDao
 ) {
-    fun getAllProducts(): Flow<List<ProductEntity>> = productDao.getProducts()
+    fun getAllProducts(): Flow<List<ProductEntity>> = productDao.getAllProducts()
     fun getAllPromotions(): Flow<List<PromotionEntity>> = promotionDao.getAllPromotions()
 
 
