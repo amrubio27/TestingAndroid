@@ -5,9 +5,7 @@ import com.amrubio27.cursotestingandroid.productlist.data.local.database.entity.
 class PromotionEntityBuilder {
     private var id: String = "promotion-1"
     private var type: String = "PERCENT"
-    private var productsIds: String = """["productId1"]"""
-    private var value: Double = 10.0
-    private var buyQuantity: Int? = null
+    private var productIds: String = """["productId1"]"""
 
     private var startAtEpoch: Long = 1700000000L
     private var endAtEpoch: Long = 1800000000L
@@ -19,9 +17,7 @@ class PromotionEntityBuilder {
 
     fun withId(id: String) = apply { this.id = id }
     fun withType(type: String) = apply { this.type = type }
-    fun withProductIds(productsIds: String) = apply { this.productsIds = productsIds }
-    fun withValue(value: Double) = apply { this.value = value }
-    fun withBuyQuantity(buyQuantity: Int?) = apply { this.buyQuantity = buyQuantity }
+    fun withProductIds(productIds: String) = apply { this.productIds = productIds }
     fun withStartTime(startTime: Long) = apply { this.startAtEpoch = startTime }
     fun withEndTime(endTime: Long) = apply { this.endAtEpoch = endTime }
     fun withPayY(payY: Int?) = apply { this.payY = payY }
@@ -31,7 +27,7 @@ class PromotionEntityBuilder {
     fun build() = PromotionEntity(
         id = id,
         type = type,
-        productIds = productsIds,
+        productIds = productIds,
         startAtEpoch = startAtEpoch,
         endAtEpoch = endAtEpoch,
         buyX = buyX,
