@@ -22,7 +22,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "package com.amrubio27.cursotestingandroid.HiltTestRunner"
     }
 
     buildTypes {
@@ -114,4 +114,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     testImplementation(libs.turbine)
+    androidTestImplementation(libs.hilt.android.testing)
 }
