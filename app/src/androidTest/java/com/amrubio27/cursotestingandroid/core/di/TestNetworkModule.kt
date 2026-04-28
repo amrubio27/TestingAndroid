@@ -1,9 +1,9 @@
 package com.amrubio27.cursotestingandroid.core.di
 
-import androidx.test.espresso.core.internal.deps.dagger.Module
 import com.amrubio27.cursotestingandroid.core.mockwebserver.MockWebServerUrlHolder
 import com.amrubio27.cursotestingandroid.di.NetworkModule
 import com.amrubio27.cursotestingandroid.productlist.data.remote.MiniMarketApiService
+import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
