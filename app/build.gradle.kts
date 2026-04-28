@@ -22,7 +22,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "package com.amrubio27.cursotestingandroid.HiltTestRunner"
+        testInstrumentationRunner = "com.amrubio27.cursotestingandroid.HiltTestRunner"
     }
 
     buildTypes {
