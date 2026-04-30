@@ -1,5 +1,6 @@
 package com.amrubio27.cursotestingandroid.productlist.data.repository
 
+import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -99,5 +100,10 @@ class SettingsRepositoryImpl @Inject constructor(
         dataStore.edit { preferences ->
             preferences[SORT_OPTION_KEY] = value.name
         }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    suspend fun clear() {
+        dataStore.edit { it.clear() }
     }
 }
