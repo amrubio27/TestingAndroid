@@ -10,7 +10,7 @@
 ## ✨ Project Goal
 
 This repository is a **practical lab** to:
-- learn and apply **best practices in Android testing**,
+- apply **best practices in Android testing**,
 - ensure **reliable and maintainable code**,
 - demonstrate real-world **software quality skills**.
 
@@ -24,7 +24,7 @@ This repository is a **practical lab** to:
 
 ---
 
-## 🧠 Recruiter-Focused Highlights
+## 🧠 Highlights
 
 - ✅ Solid understanding of **Android testing**  
 - ✅ Testable architecture mindset  
@@ -33,7 +33,7 @@ This repository is a **practical lab** to:
 
 ---
 
-## 🛠️ Tech Stack (adjust to your actual stack)
+## 🛠️ Tech Stack
 
 - Kotlin  
 - JUnit  
