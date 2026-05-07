@@ -116,4 +116,5 @@ dependencies {
     testImplementation(libs.turbine)
     androidTestImplementation(libs.hilt.android.testing)
     androidTestImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.kotlin.test)
 }
