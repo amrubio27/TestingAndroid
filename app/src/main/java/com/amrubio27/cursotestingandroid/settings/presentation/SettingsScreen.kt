@@ -36,7 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amrubio27.cursotestingandroid.core.domain.model.ThemeMode
 import com.amrubio27.cursotestingandroid.core.presentation.components.MarketTopAppBar
 
-@Preview
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit = {},
@@ -44,7 +43,23 @@ fun SettingsScreen(
 ) {
 
     val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
+    SettingsContent(
+        uiState = uiState,
+        onBack = onBack,
+        onInStockOnlyChange = { newState -> settingsViewModel.setInStockOnly(newState) },
+        onThemeModeSelected = { themeMode -> settingsViewModel.setThemeMode(themeMode) }
+    )
 
+}
+
+@Preview
+@Composable
+fun SettingsContent(
+    uiState: SettingsUiState = SettingsUiState(),
+    onBack: () -> Unit = {},
+    onInStockOnlyChange: (Boolean) -> Unit = {},
+    onThemeModeSelected: (ThemeMode) -> Unit = {}
+) {
     Scaffold(
         topBar = {
             MarketTopAppBar(
@@ -109,9 +124,7 @@ fun SettingsScreen(
 
                         Switch(
                             checked = uiState.inStockOnly,
-                            onCheckedChange = { newState ->
-                                settingsViewModel.setInStockOnly(newState)
-                            }
+                            onCheckedChange = onInStockOnlyChange
                         )
                     }
 
@@ -195,19 +208,19 @@ fun SettingsScreen(
                         ) {
                             SegmentedButton(
                                 shape = SegmentedButtonDefaults.itemShape(0, 3),
-                                onClick = { settingsViewModel.setThemeMode(ThemeMode.SYSTEM) },
+                                onClick = { onThemeModeSelected(ThemeMode.SYSTEM) },
                                 selected = uiState.themeMode == ThemeMode.SYSTEM,
                                 label = { Text("Sistema") }
                             )
                             SegmentedButton(
                                 shape = SegmentedButtonDefaults.itemShape(1, 3),
-                                onClick = { settingsViewModel.setThemeMode(ThemeMode.LIGHT) },
+                                onClick = { onThemeModeSelected(ThemeMode.LIGHT) },
                                 selected = uiState.themeMode == ThemeMode.LIGHT,
                                 label = { Text("Claro") }
                             )
                             SegmentedButton(
                                 shape = SegmentedButtonDefaults.itemShape(2, 3),
-                                onClick = { settingsViewModel.setThemeMode(ThemeMode.DARK) },
+                                onClick = { onThemeModeSelected(ThemeMode.DARK) },
                                 selected = uiState.themeMode == ThemeMode.DARK,
                                 label = { Text("Oscuro") }
                             )
