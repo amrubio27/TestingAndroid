@@ -28,13 +28,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.amrubio27.cursotestingandroid.R
 import com.amrubio27.cursotestingandroid.core.domain.model.ThemeMode
 import com.amrubio27.cursotestingandroid.core.presentation.components.MarketTopAppBar
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.SETTINGS_CONTENT
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.SETTINGS_IN_STOCK_SWITCH
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.SETTINGS_TAX_SWITCH
 
 @Composable
 fun SettingsScreen(
@@ -52,22 +59,23 @@ fun SettingsScreen(
 
 }
 
-@Preview
+
 @Composable
 fun SettingsContent(
-    uiState: SettingsUiState = SettingsUiState(),
-    onBack: () -> Unit = {},
-    onInStockOnlyChange: (Boolean) -> Unit = {},
-    onThemeModeSelected: (ThemeMode) -> Unit = {}
+    uiState: SettingsUiState,
+    onBack: () -> Unit,
+    onInStockOnlyChange: (Boolean) -> Unit,
+    onThemeModeSelected: (ThemeMode) -> Unit
 ) {
     Scaffold(
         topBar = {
             MarketTopAppBar(
-                title = "Ajustes", onBackSelected = { onBack() })
+                title = stringResource(R.string.settings_title), onBackSelected = { onBack() })
         }) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .testTag(SETTINGS_CONTENT)
                 .padding(paddingValues)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -93,7 +101,7 @@ fun SettingsContent(
                         )
 
                         Text(
-                            "Filtros y visualización",
+                            stringResource(R.string.settings_filters_section),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
@@ -111,7 +119,7 @@ fun SettingsContent(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(
-                                "Solo productos en Stock",
+                                stringResource(R.string.settings_in_stock_only),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
@@ -124,7 +132,8 @@ fun SettingsContent(
 
                         Switch(
                             checked = uiState.inStockOnly,
-                            onCheckedChange = onInStockOnlyChange
+                            onCheckedChange = onInStockOnlyChange,
+                            modifier = Modifier.testTag(SETTINGS_IN_STOCK_SWITCH)
                         )
                     }
 
@@ -152,7 +161,8 @@ fun SettingsContent(
 
                         Switch(
                             checked = true,
-                            onCheckedChange = {}
+                            onCheckedChange = {},
+                            modifier = Modifier.testTag(SETTINGS_TAX_SWITCH)
                         )
                     }
                 }
@@ -193,7 +203,7 @@ fun SettingsContent(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
-                            "Tema de la aplicación",
+                            stringResource(R.string.settings_theme_label),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
                         )
@@ -207,18 +217,21 @@ fun SettingsContent(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             SegmentedButton(
+                                modifier = Modifier.testTag(UiTestTag.settingsThemeOption("system")),
                                 shape = SegmentedButtonDefaults.itemShape(0, 3),
                                 onClick = { onThemeModeSelected(ThemeMode.SYSTEM) },
                                 selected = uiState.themeMode == ThemeMode.SYSTEM,
                                 label = { Text("Sistema") }
                             )
                             SegmentedButton(
+                                modifier = Modifier.testTag(UiTestTag.settingsThemeOption("light")),
                                 shape = SegmentedButtonDefaults.itemShape(1, 3),
                                 onClick = { onThemeModeSelected(ThemeMode.LIGHT) },
                                 selected = uiState.themeMode == ThemeMode.LIGHT,
                                 label = { Text("Claro") }
                             )
                             SegmentedButton(
+                                modifier = Modifier.testTag(UiTestTag.settingsThemeOption("dark")),
                                 shape = SegmentedButtonDefaults.itemShape(2, 3),
                                 onClick = { onThemeModeSelected(ThemeMode.DARK) },
                                 selected = uiState.themeMode == ThemeMode.DARK,
@@ -230,4 +243,15 @@ fun SettingsContent(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun SettingsContentPreview() {
+    SettingsContent(
+        uiState = SettingsUiState(),
+        onBack = {},
+        onThemeModeSelected = {},
+        onInStockOnlyChange = {}
+    )
 }
