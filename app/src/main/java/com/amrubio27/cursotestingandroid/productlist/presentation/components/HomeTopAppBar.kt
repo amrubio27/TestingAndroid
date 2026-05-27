@@ -16,8 +16,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_BADGE
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +64,9 @@ fun HomeTopAppBar(
             }
             BadgedBox(modifier = Modifier.padding(end = 4.dp), badge = {
                 if (cartItemCount > 0) {
-                    Badge {
+                    Badge(
+                        modifier = Modifier.testTag(TOP_APP_BAR_BADGE)
+                    ) {
                         Text(
                             if (cartItemCount > 99) "99+" else cartItemCount.toString(),
                             style = MaterialTheme.typography.labelSmall,

@@ -12,6 +12,7 @@ import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.milk
 import com.amrubio27.cursotestingandroid.core.mothers.uistate.ProductListUiStateMother
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.FILTER_VIEW
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.PRODUCT_LIST_LOADING
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_BADGE
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListCategory
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListItem
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListSortOption
@@ -139,5 +140,30 @@ class ProductListScreenTest {
         composeRule.onNodeWithTag(testTag = productListSortOption(SortOption.DISCOUNT))
             .assertIsSelected()
     }
+
+    @Test
+    fun givenCartItemCountZero_whenRendered_thenHidesBadge() {
+        createProductListScreen(cartItemCount = 0)
+
+        composeRule.onNodeWithTag(testTag = TOP_APP_BAR_BADGE).assertDoesNotExist()
+    }
+
+    @Test
+    fun givenCartItemCountPositive_whenRendered_thenShowsBadgeWithCount() {
+        createProductListScreen(cartItemCount = 67)
+
+        composeRule.onNodeWithTag(testTag = TOP_APP_BAR_BADGE).assertIsDisplayed()
+        composeRule.onNodeWithText("67").assertIsDisplayed()
+    }
+
+    @Test
+    fun givenCartItemCountOver99_whenRendered_thenShows99Plus() {
+        createProductListScreen(cartItemCount = 345)
+
+        composeRule.onNodeWithTag(testTag = TOP_APP_BAR_BADGE).assertIsDisplayed()
+        composeRule.onNodeWithText("99+").assertIsDisplayed()
+    }
+
+
 
 }
