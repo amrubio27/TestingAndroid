@@ -12,6 +12,10 @@ object ProductListUiStateMother {
             ProductWithPromotion(ProductMother.coffee(), PromotionMother.percent()),
             ProductWithPromotion(ProductMother.bread()),
             ProductWithPromotion(ProductMother.milk()),
+            /*ProductWithPromotion(product {withId("123")}),
+            ProductWithPromotion(product {withId("1234")}),
+            ProductWithPromotion(product {withId("12345")}),
+            ProductWithPromotion(product {withId("1234556")}),*/
         ),
         categories: List<String> = listOf("bread", "drinks", "lacteo"),
         selectedCategory: String? = null,

@@ -15,7 +15,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.FILTER_VIEW
 import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
 import com.amrubio27.cursotestingandroid.productlist.presentation.ProductListUiState
 
@@ -29,6 +31,7 @@ fun FiltersMenu(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .testTag(FILTER_VIEW)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
