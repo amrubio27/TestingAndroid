@@ -2,6 +2,7 @@ package com.amrubio27.cursotestingandroid.productlist.presentation
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -11,7 +12,9 @@ import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.milk
 import com.amrubio27.cursotestingandroid.core.mothers.uistate.ProductListUiStateMother
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.FILTER_VIEW
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.PRODUCT_LIST_LOADING
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListCategory
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListItem
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListSortOption
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
 import org.junit.Rule
@@ -87,6 +90,54 @@ class ProductListScreenTest {
         createProductListScreen(uiState = ProductListUiStateMother.success(products = emptyList()))
 
         composeRule.onNodeWithText("No se encontraron productos").assertIsDisplayed()
+    }
+
+    @Test
+    fun givenNoCategorySelected_whenRendered_thenMarkAllChip() {
+        createProductListScreen(
+            uiState = ProductListUiStateMother.success(selectedCategory = null)
+        )
+
+        composeRule.onNodeWithTag(testTag = productListCategory(null)).assertIsSelected()
+    }
+
+    @Test
+    fun givenCategorySelected_whenRendered_thenMarkThatChip() {
+        createProductListScreen(
+            uiState = ProductListUiStateMother.success(selectedCategory = "drinks")
+        )
+
+        composeRule.onNodeWithTag(testTag = productListCategory("drinks")).assertIsSelected()
+    }
+
+    @Test
+    fun givenPriceAscSelected_whenRendered_thenMarkThatChip() {
+        createProductListScreen(
+            uiState = ProductListUiStateMother.success(sortOption = SortOption.PRICE_ASC)
+        )
+
+        composeRule.onNodeWithTag(testTag = productListSortOption(SortOption.PRICE_ASC))
+            .assertIsSelected()
+    }
+
+    @Test
+    fun givenPriceDescSelected_whenRendered_thenMarkThatChip() {
+        createProductListScreen(
+            uiState = ProductListUiStateMother.success(sortOption = SortOption.PRICE_DESC)
+        )
+
+        composeRule.onNodeWithTag(testTag = productListSortOption(SortOption.PRICE_DESC))
+            .assertIsSelected()
+    }
+
+    @Test
+    fun givenDiscountSelected_whenRendered_thenMarkThatChip() {
+        createProductListScreen(
+            uiState = ProductListUiStateMother.success(sortOption = SortOption.DISCOUNT)
+        )
+
+        composeRule.onNodeWithTag(testTag = productListSortOption(SortOption.DISCOUNT))
+            .assertIsSelected()
     }
 
 }

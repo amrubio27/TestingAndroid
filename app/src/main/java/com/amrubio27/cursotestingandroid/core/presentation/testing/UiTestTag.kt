@@ -1,5 +1,7 @@
 package com.amrubio27.cursotestingandroid.core.presentation.testing
 
+import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
+
 object UiTestTag {
     const val TOP_APP_BAR = "top_app_bar"
     const val FILTER_VIEW = "filter_view"
@@ -15,4 +17,9 @@ object UiTestTag {
     const val PRODUCT_LIST_LOADING = "product_list_loading"
     const val PRODUCT_LIST_LIST = "product_list_list"
     fun productListItem(productId: String) = "product_list_item_$productId"
+    fun productListCategory(category: String?) = "product_list_category_${category ?: "all"}"
+    fun productListSortOption(sortOption: SortOption) =
+        "product_list_sort_${sortOption.name.lowercase()}"
+
+
 }

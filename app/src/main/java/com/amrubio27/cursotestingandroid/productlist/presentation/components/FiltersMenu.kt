@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.FILTER_VIEW
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListCategory
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListSortOption
 import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
 import com.amrubio27.cursotestingandroid.productlist.presentation.ProductListUiState
 
@@ -52,12 +54,14 @@ fun FiltersMenu(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 FilterChip(
+                    modifier = Modifier.testTag(productListCategory(null)),
                     selected = state.selectedCategory == null,
                     onClick = { onCategorySelected(null) },
                     label = { Text("Todas", style = MaterialTheme.typography.labelSmall) }
                 )
                 state.categories.forEach { category ->
                     FilterChip(
+                        modifier = Modifier.testTag(productListCategory(category)),
                         selected = category.equals(state.selectedCategory, ignoreCase = true),
                         onClick = { onCategorySelected(category) },
                         label = { Text(category, style = MaterialTheme.typography.labelSmall) }
@@ -82,19 +86,25 @@ fun FiltersMenu(
                     selected = state.sortOption == SortOption.PRICE_ASC,
                     onClick = { onSortSelected(SortOption.PRICE_ASC) },
                     label = { Text("Precio ↑", style = MaterialTheme.typography.labelSmall) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(productListSortOption(SortOption.PRICE_ASC))
                 )
                 FilterChip(
                     selected = state.sortOption == SortOption.PRICE_DESC,
                     onClick = { onSortSelected(SortOption.PRICE_DESC) },
                     label = { Text("Precio ↓", style = MaterialTheme.typography.labelSmall) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(productListSortOption(SortOption.PRICE_DESC))
                 )
                 FilterChip(
                     selected = state.sortOption == SortOption.DISCOUNT,
                     onClick = { onSortSelected(SortOption.DISCOUNT) },
                     label = { Text("Descuento", style = MaterialTheme.typography.labelSmall) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(productListSortOption(SortOption.DISCOUNT))
                 )
             }
         }
