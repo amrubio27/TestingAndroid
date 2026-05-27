@@ -22,11 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListItem
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromotion
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 import java.util.Locale
@@ -48,6 +50,7 @@ fun ProductItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .testTag(productListItem(product.id))
             .padding(start = 16.dp, end = 16.dp, top = 16.dp)
             .clickable { onClick(item) },
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
