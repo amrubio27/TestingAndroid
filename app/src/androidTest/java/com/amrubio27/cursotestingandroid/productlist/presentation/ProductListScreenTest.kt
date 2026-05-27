@@ -2,6 +2,7 @@ package com.amrubio27.cursotestingandroid.productlist.presentation
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import com.amrubio27.cursotestingandroid.core.mothers.uistate.ProductListUiStateMother
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
 import org.junit.Rule
@@ -11,7 +12,7 @@ class ProductListScreenTest {
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     private fun createProductListScreen(
-        uiState: ProductListUiState = ProductListUiState.Loading,
+        uiState: ProductListUiState = ProductListUiStateMother.success(),
         cartItemCount: Int = 0,
         filterVisible: Boolean = true,
         onFilterSelected: (Boolean) -> Unit = {},
