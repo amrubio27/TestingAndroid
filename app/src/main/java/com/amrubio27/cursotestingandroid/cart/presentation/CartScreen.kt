@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,9 @@ import com.amrubio27.cursotestingandroid.cart.domain.model.CartSummary
 import com.amrubio27.cursotestingandroid.cart.presentation.model.CartItemWithPromotion
 import com.amrubio27.cursotestingandroid.core.presentation.components.MarketTopAppBar
 import com.amrubio27.cursotestingandroid.core.presentation.components.QuantitySelector
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.CART_EMPTY
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.CART_LOADING
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.CART_RETRY
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromotion
 import java.text.NumberFormat
 import java.util.Currency.getInstance
@@ -72,6 +76,37 @@ fun CartScreen(
         }
     }
 
+    CartContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onBack = onBack,
+        onRetrySelected = { cartViewModel.refresh() },
+        onIncreaseQuantity = { productId, quantity ->
+            cartViewModel.increaseQuantity(
+                productId,
+                quantity
+            )
+        },
+        onDecreaseQuantity = { productId, quantity ->
+            cartViewModel.decreaseQuantity(
+                productId,
+                quantity
+            )
+        },
+        onRemove = { id -> cartViewModel.removeFromCart(id) }
+    )
+}
+
+@Composable
+fun CartContent(
+    uiState: CartUiState,
+    snackbarHostState: SnackbarHostState = SnackbarHostState(),
+    onBack: () -> Unit,
+    onRetrySelected: () -> Unit,
+    onIncreaseQuantity: (String, Int) -> Unit,
+    onDecreaseQuantity: (String, Int) -> Unit,
+    onRemove: (String) -> Unit
+) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -79,7 +114,7 @@ fun CartScreen(
                 title = "Carrito",
                 onBackSelected = { onBack() })
         }) { paddingValues ->
-        when (val state = uiState) {
+        when (uiState) {
             CartUiState.Loading -> {
                 CartLoadingStateScreen(
                     Modifier
@@ -93,8 +128,9 @@ fun CartScreen(
                     Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    state,
-                ) { cartViewModel.refresh() }
+                    uiState,
+                    onRetrySelected
+                )
             }
 
             is CartUiState.Success -> {
@@ -102,17 +138,15 @@ fun CartScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    state = state,
-                    onIncreaseQuantity = { productId, quantity ->
-                        cartViewModel.increaseQuantity(productId, quantity)
-                    },
-                    onDecreaseQuantity = { productId, quantity ->
-                        cartViewModel.decreaseQuantity(productId, quantity)
-                    },
-                    onRemove = { id -> cartViewModel.removeFromCart(id) })
+                    state = uiState,
+                    onIncreaseQuantity = onIncreaseQuantity,
+                    onDecreaseQuantity = onDecreaseQuantity,
+                    onRemove = onRemove
+                )
             }
         }
     }
+
 }
 
 @Composable
@@ -130,7 +164,9 @@ fun CartErrorStateScreen(
             color = MaterialTheme.colorScheme.error
         )
         Spacer(Modifier.height(16.dp))
-        Button(onClick = { onRetrySelected() }) {
+        Button(
+            modifier = Modifier.testTag(CART_RETRY),
+            onClick = { onRetrySelected() }) {
             Text("Reintentar")
         }
     }
@@ -139,7 +175,7 @@ fun CartErrorStateScreen(
 @Composable
 fun CartLoadingStateScreen(modifier: Modifier = Modifier) {
     Box(modifier, contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(modifier = Modifier.testTag(CART_LOADING))
     }
 }
 
@@ -162,7 +198,9 @@ fun CartSuccessStateScreen(
         AnimatedContent(state.cartItems.isEmpty()) { isEmpty ->
             if (isEmpty) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(CART_EMPTY),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
