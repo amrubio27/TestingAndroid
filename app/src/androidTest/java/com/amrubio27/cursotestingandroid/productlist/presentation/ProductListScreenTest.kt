@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.bread
 import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.coffee
 import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.milk
@@ -13,11 +14,16 @@ import com.amrubio27.cursotestingandroid.core.mothers.uistate.ProductListUiState
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.FILTER_VIEW
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.PRODUCT_LIST_LOADING
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_BADGE
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_CART
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_FILTER
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_SETTINGS
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListCategory
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListItem
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.productListSortOption
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 import com.amrubio27.cursotestingandroid.productlist.domain.model.SortOption
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import org.junit.Rule
 import kotlin.test.Test
 
@@ -163,6 +169,47 @@ class ProductListScreenTest {
         composeRule.onNodeWithTag(testTag = TOP_APP_BAR_BADGE).assertIsDisplayed()
         composeRule.onNodeWithText("99+").assertIsDisplayed()
     }
+
+    @Test
+    fun givenFiltersVisible_whenToggleClicked_thenEmitFalse() {
+        var emitted: Boolean? = null
+        createProductListScreen(
+            filterVisible = true,
+            onFilterSelected = { emitted = it })
+
+        composeRule.onNodeWithTag(TOP_APP_BAR_FILTER).performClick()
+        assertEquals(false, emitted)
+    }
+
+    @Test
+    fun givenFiltersHidden_whenToggleClicked_thenEmitTrue() {
+        var emitted: Boolean? = null
+        createProductListScreen(
+            filterVisible = false,
+            onFilterSelected = { emitted = it })
+
+        composeRule.onNodeWithTag(testTag = TOP_APP_BAR_FILTER).performClick()
+        assertEquals(true, emitted)
+    }
+
+    @Test
+    fun givenProductListRendered_whenSettingsIconClicked_thenEmitCallback() {
+        var settingClicked = false
+        createProductListScreen(onSettingsSelected = { settingClicked = true })
+
+        composeRule.onNodeWithTag(testTag = TOP_APP_BAR_SETTINGS).performClick()
+        assertTrue(settingClicked)
+    }
+
+    @Test
+    fun givenProductListRendered_whenCartIconClicked_thenEmitCallback() {
+        var cartClicked = false
+        createProductListScreen(onCartSelected = { cartClicked = true })
+
+        composeRule.onNodeWithTag(testTag = TOP_APP_BAR_CART).performClick()
+        assertTrue(cartClicked)
+    }
+
 
 
 
