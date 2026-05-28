@@ -20,6 +20,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_BADGE
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_CART
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_FILTER
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_SETTINGS
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +48,7 @@ fun HomeTopAppBar(
         ),
         actions = {
             IconButton(
+                modifier = Modifier.testTag(TOP_APP_BAR_FILTER),
                 onClick = { onFilterSelected(!filtersVisible) }
             ) {
                 Icon(
@@ -54,6 +58,7 @@ fun HomeTopAppBar(
                 )
             }
             IconButton(
+                modifier = Modifier.testTag(TOP_APP_BAR_SETTINGS),
                 onClick = { onSettingsSelected() }
             ) {
                 Icon(
@@ -75,7 +80,9 @@ fun HomeTopAppBar(
                     }
                 }
             }) {
-                IconButton(onClick = { onCartSelected() }) {
+                IconButton(
+                    modifier = Modifier.testTag(TOP_APP_BAR_CART),
+                    onClick = { onCartSelected() }) {
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
                         contentDescription = null,
