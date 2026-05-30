@@ -56,6 +56,9 @@ import com.amrubio27.cursotestingandroid.core.presentation.components.QuantitySe
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.CART_EMPTY
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.CART_LOADING
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.CART_RETRY
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.cartItem
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.cartQuantityDecrease
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.cartQuantityIncrease
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromotion
 import java.text.NumberFormat
 import java.util.Currency.getInstance
@@ -285,7 +288,7 @@ fun CartSummaryCard(modifier: Modifier, summary: CartSummary, currencyFormatter:
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "Subtotal",
+                    "Subtotal:",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
@@ -301,7 +304,7 @@ fun CartSummaryCard(modifier: Modifier, summary: CartSummary, currencyFormatter:
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Descuento",
+                        "Descuento:",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.error,
                     )
@@ -323,7 +326,7 @@ fun CartSummaryCard(modifier: Modifier, summary: CartSummary, currencyFormatter:
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "Total",
+                    "Total:",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Bold
@@ -372,7 +375,7 @@ fun CartItemCard(
     }
 
     SwipeToDismissBox(
-        modifier = modifier,
+        modifier = modifier.testTag(cartItem(product.id)),
         state = dismissState,
         enableDismissFromEndToStart = false,
         backgroundContent = {
@@ -464,6 +467,8 @@ fun CartItemCard(
                         canIncrease = cartItem.quantity < product.stock,
                         onDecreaseSelected = { onDecreaseQuantity(product.id, cartItem.quantity) },
                         onIncreaseSelected = { onIncreaseQuantity(product.id, cartItem.quantity) },
+                        increaseTestTag = cartQuantityIncrease(product.id),
+                        decreaseTestTag = cartQuantityDecrease(product.id)
                     )
                 }
             }
