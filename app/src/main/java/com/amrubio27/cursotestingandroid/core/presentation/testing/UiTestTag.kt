@@ -32,11 +32,7 @@ object UiTestTag {
     const val CART_RETRY = "cart_retry"
     const val CART_EMPTY = "cart_empty"
 
-    /*const val CART_LIST = "cart_list"
-
-    const val CART_ERROR = "cart_error"
     fun cartItem(productId: String) = "cart_item_$productId"
-    fun cartItemIncrease(productId: String) = "cart_item_increase_$productId"
-    fun cartItemDecrease(productId: String) = "cart_item_decrease_$productId"
-    fun cartItemRemove(productId: String) = "cart_item_remove_$productId"*/
+    fun cartQuantityIncrease(productId: String) = "cart_quantity_increase_$productId"
+    fun cartQuantityDecrease(productId: String) = "cart_quantity_decrease_$productId"
 }

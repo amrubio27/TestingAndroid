@@ -2,16 +2,29 @@ package com.amrubio27.cursotestingandroid.cart.presentation
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeRight
+import com.amrubio27.cursotestingandroid.cart.presentation.model.CartItemWithPromotion
+import com.amrubio27.cursotestingandroid.core.mothers.CartUiStateMother.cartItemWithPromotion
+import com.amrubio27.cursotestingandroid.core.mothers.CartUiStateMother.cartSuccess
+import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.bread
+import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.coffee
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.CART_EMPTY
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.CART_LOADING
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.CART_RETRY
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.cartItem
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.cartQuantityDecrease
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.cartQuantityIncrease
 import junit.framework.TestCase.assertTrue
 import org.junit.Rule
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class CartScreenTest {
 
@@ -85,4 +98,99 @@ class CartScreenTest {
         composeRule.onNodeWithText("Agrega productos para comenzar").assertIsDisplayed()
     }
 
+    @Test
+    fun givenSuccessState_whenRendered_thenShowsItemsQuantitiesAndSummary() {
+        createCartScreen(state = cartSuccess())
+
+        composeRule.onNodeWithText(coffee().name).assertIsDisplayed()
+        composeRule.onNodeWithText(bread().name).assertIsDisplayed()
+        composeRule.onNodeWithText("Subtotal:").assertIsDisplayed()
+        composeRule.onNodeWithText("Descuento:").assertIsDisplayed()
+        composeRule.onNodeWithText("Total:").assertIsDisplayed()
+
+        composeRule.onNodeWithTag(testTag = cartItem(productId = coffee().id)).assertIsDisplayed()
+        composeRule.onNodeWithTag(testTag = cartItem(productId = bread().id)).assertIsDisplayed()
+    }
+
+    @Test
+    fun givenInitialQuantity_whenIncreaseClicked_thenEmitsIncreaseQuantity() {
+        var emitted: Pair<String, Int>? = null
+        val initialQuantity = 2
+
+        createCartScreen(
+            state = cartSuccess(
+                cartItems = listOf(
+                    cartItemWithPromotion(
+                        product = bread(), quantity = initialQuantity
+                    )
+                )
+            ),
+            onIncreaseQuantity = { productId, quantity -> emitted = productId to quantity }
+        )
+
+        composeRule.onNodeWithTag(testTag = cartQuantityIncrease(productId = bread().id))
+            .assertIsEnabled().performClick()
+
+        assertEquals(expected = bread().id to (initialQuantity), actual = emitted)
+    }
+
+    @Test
+    fun givenInitialQuantity_whenDecreaseClicked_thenEmitsDecreaseQuantity() {
+        var emitted: Pair<String, Int>? = null
+        val initialQuantity = 3
+
+        createCartScreen(
+            state = cartSuccess(
+                cartItems = listOf(
+                    cartItemWithPromotion(
+                        product = bread(), quantity = initialQuantity
+                    )
+                )
+            ),
+            onDecreaseQuantity = { productId, quantity -> emitted = productId to quantity }
+        )
+
+        composeRule.onNodeWithTag(testTag = cartQuantityDecrease(productId = bread().id))
+            .assertIsEnabled().performClick()
+
+        assertEquals(expected = bread().id to (initialQuantity), actual = emitted)
+    }
+
+    @Test
+    fun givenCartItem_whenSwipedRight_thenEmitsRemoveCallback() {
+        var removeProductId: String? = null
+
+        createCartScreen(
+            state = cartSuccess(
+                cartItems = listOf(
+                    cartItemWithPromotion(
+                        product = bread(), quantity = 2
+                    )
+                )
+            ),
+            onRemove = { removeProductId = it }
+        )
+
+        composeRule.onNodeWithTag(cartItem(bread().id))
+            .performTouchInput { swipeRight() }
+
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            removeProductId != null
+        }
+
+        assertEquals(bread().id, removeProductId)
+    }
+
+    @Test
+    fun givenItemsAtStockEdges_whenRendered_thenInvalidControlsAreDisable() {
+        val fullStockItem: CartItemWithPromotion = cartItemWithPromotion(
+            product = bread(stock = 7),
+            quantity = 7
+        )
+
+        createCartScreen(state = cartSuccess(cartItems = listOf(fullStockItem)))
+
+        composeRule.onNodeWithTag(testTag = cartQuantityIncrease(productId = bread().id))
+            .assertIsNotEnabled()
+    }
 }
