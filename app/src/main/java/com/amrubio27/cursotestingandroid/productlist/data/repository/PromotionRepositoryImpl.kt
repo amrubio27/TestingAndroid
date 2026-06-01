@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -41,7 +42,7 @@ class PromotionRepositoryImpl @Inject constructor(
                 refreshScope.launch {
                     if (!refreshMutex.tryLock()) return@launch
                     try {
-                        refreshPromotions()
+                        refreshPromotionsInternal()
                     } catch (e: Exception) {
                     } finally {
                         refreshMutex.unlock()
@@ -54,13 +55,18 @@ class PromotionRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun refreshPromotions() {
+    private suspend fun refreshPromotionsInternal() {
         withContext(dispatchersProvider.io) {
             val promotions = remoteDataSource.getPromotions().getOrThrow()
             val promotionsEntity: List<PromotionEntity> =
                 promotions.mapNotNull { it.toEntity(json) }
             localDataSource.savePromotions(promotionsEntity)
+        }
+    }
 
+    override suspend fun refreshPromotions() {
+        refreshMutex.withLock {
+            refreshPromotionsInternal()
         }
     }
 }

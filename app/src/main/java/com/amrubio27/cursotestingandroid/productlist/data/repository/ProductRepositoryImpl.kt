@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -38,7 +39,7 @@ class ProductRepositoryImpl @Inject constructor(
                 refreshScope.launch {
                     if (!refreshMutex.tryLock()) return@launch
                     try {
-                        refreshProducts()
+                        refreshProductsInternal()
                     } catch (e: Exception) {
                     } finally {
                         refreshMutex.unlock()
@@ -62,12 +63,17 @@ class ProductRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun refreshProducts() {
+    private suspend fun refreshProductsInternal() {
         withContext(dispatchersProvider.io) {
             val products = remoteDataSource.getProducts().getOrThrow()
             val productsEntity = products.map { it.toEntity() }
             localDataSource.saveProducts(productsEntity)
+        }
+    }
 
+    override suspend fun refreshProducts() {
+        refreshMutex.withLock {
+            refreshProductsInternal()
         }
     }
 
