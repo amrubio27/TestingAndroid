@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -38,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.amrubio27.cursotestingandroid.R
 import com.amrubio27.cursotestingandroid.core.presentation.components.MarketTopAppBar
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.PRODUCT_DETAIL_LOADING
 import com.amrubio27.cursotestingandroid.detail.presentation.components.AddToCartButton
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromotion
 
@@ -77,6 +79,21 @@ fun ProductDetailScreen(
         }
     }
 
+    ProductDetailContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onBack = onBack,
+        onAddToCart = { productDetailViewModel.addToCart() }
+    )
+}
+
+@Composable
+fun ProductDetailContent(
+    uiState: ProductDetailUiState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onBack: () -> Unit,
+    onAddToCart: () -> Unit
+) {
     Scaffold(topBar = {
         MarketTopAppBar(
             title = uiState.item?.product?.name.orEmpty(), onBackSelected = { onBack() })
@@ -87,10 +104,9 @@ fun ProductDetailScreen(
             AddToCartButton(
                 modifier = Modifier.weight(1f),
                 product = uiState.item?.product,
-                isLoading = uiState.isLoading
-            ) {
-                productDetailViewModel.addToCart()
-            }
+                isLoading = uiState.isLoading,
+                addToCart = onAddToCart
+            )
         }
     }, snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
         Column(
@@ -101,7 +117,7 @@ fun ProductDetailScreen(
         ) {
             if (uiState.isLoading) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(modifier = Modifier.testTag(PRODUCT_DETAIL_LOADING))
                 }
             } else {
                 uiState.item?.let {
@@ -275,4 +291,3 @@ fun ProductDetailScreen(
         }
     }
 }
-
