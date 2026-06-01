@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.amrubio27.cursotestingandroid.R
 import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.coffee
 import com.amrubio27.cursotestingandroid.core.mothers.PromotionMother.buyXPayY
 import com.amrubio27.cursotestingandroid.core.mothers.PromotionMother.percent
@@ -40,6 +41,10 @@ class ProductDetailScreenTest {
         }
     }
 
+    private fun getString(resId: Int): String = composeRule.activity.getString(resId)
+    private fun getString(resId: Int, vararg formatArgs: Any): String =
+        composeRule.activity.getString(resId, *formatArgs)
+
     @Test
     fun givenLoadingState_whenRendered_thenShowsProgressView() {
         createProductDetailScreen(uiState = ProductDetailUiStateMother.loading())
@@ -61,7 +66,7 @@ class ProductDetailScreenTest {
         composeRule.onNodeWithText(product.category).assertIsDisplayed()
         composeRule.onNodeWithText(product.description).assertIsDisplayed()
         composeRule.onNodeWithText(product.price.toString()).assertIsDisplayed()
-        composeRule.onNodeWithText("5 unidades").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.detail_stock_units, 5)).assertIsDisplayed()
 
         composeRule.onNodeWithTag(testTag = PRODUCT_DETAIL_ADD_TO_CART).assertIsEnabled()
     }
@@ -82,7 +87,7 @@ class ProductDetailScreenTest {
         // Descuento
         composeRule.onNodeWithText("3.6").assertIsDisplayed()
         // Porcentaje
-        composeRule.onNodeWithText("20% OFF ").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.detail_percent_off, 20)).assertIsDisplayed()
     }
 
     @Test
@@ -99,7 +104,7 @@ class ProductDetailScreenTest {
         // Precio original
         composeRule.onNodeWithText(product.price.toString()).assertIsDisplayed()
         // Etiqueta de promoción 3x2
-        composeRule.onNodeWithText("PROMO: 3x2").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.detail_promo, "3x2")).assertIsDisplayed()
     }
 
     @Test
@@ -112,7 +117,7 @@ class ProductDetailScreenTest {
             )
         )
 
-        composeRule.onNodeWithText("Sin stock").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.detail_no_stock)).assertIsDisplayed()
         composeRule.onNodeWithTag(testTag = PRODUCT_DETAIL_ADD_TO_CART).assertIsNotEnabled()
     }
 

@@ -124,7 +124,7 @@ fun SettingsContent(
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                "Muestra únicamente productos disponibles",
+                                stringResource(R.string.settings_in_stock_only_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -148,12 +148,12 @@ fun SettingsContent(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(
-                                "Mostrar impuestos incluídos",
+                                stringResource(R.string.settings_show_taxes),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                "Incluir impuestos de los precios mostrados",
+                                stringResource(R.string.settings_show_taxes_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -189,7 +189,7 @@ fun SettingsContent(
                         )
 
                         Text(
-                            "Apariencia",
+                            stringResource(R.string.settings_appearance_section),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
@@ -208,7 +208,7 @@ fun SettingsContent(
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            "Elige entre modo claro, oscuro o seguir el sistema",
+                            stringResource(R.string.settings_theme_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -221,21 +221,21 @@ fun SettingsContent(
                                 shape = SegmentedButtonDefaults.itemShape(0, 3),
                                 onClick = { onThemeModeSelected(ThemeMode.SYSTEM) },
                                 selected = uiState.themeMode == ThemeMode.SYSTEM,
-                                label = { Text("Sistema") }
+                                label = { Text(stringResource(R.string.settings_theme_system)) }
                             )
                             SegmentedButton(
                                 modifier = Modifier.testTag(UiTestTag.settingsThemeOption("light")),
                                 shape = SegmentedButtonDefaults.itemShape(1, 3),
                                 onClick = { onThemeModeSelected(ThemeMode.LIGHT) },
                                 selected = uiState.themeMode == ThemeMode.LIGHT,
-                                label = { Text("Claro") }
+                                label = { Text(stringResource(R.string.settings_theme_light)) }
                             )
                             SegmentedButton(
                                 modifier = Modifier.testTag(UiTestTag.settingsThemeOption("dark")),
                                 shape = SegmentedButtonDefaults.itemShape(2, 3),
                                 onClick = { onThemeModeSelected(ThemeMode.DARK) },
                                 selected = uiState.themeMode == ThemeMode.DARK,
-                                label = { Text("Oscuro") }
+                                label = { Text(stringResource(R.string.settings_theme_dark)) }
                             )
                         }
                     }

@@ -47,7 +47,7 @@ class SettingsScreenTest {
     @Test
     fun firstUITest() {
         createSettingsScreen()
-        composeRule.onNodeWithText("Ajustes").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.settings_title)).assertIsDisplayed()
     }
 
     private fun getString(resId: Int): String = composeRule.activity.getString(resId)

@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,11 @@ fun ProductDetailScreen(
     productDetailViewModel: ProductDetailViewModel = hiltViewModel()
 ) {
 
+    val insufficientStockMessage = stringResource(R.string.detail_error_insufficient_stock)
+    val networkErrorMessage = stringResource(R.string.detail_error_network)
+    val unknownErrorMessage = stringResource(R.string.detail_error_unknown)
+    val successAddedMessage = stringResource(R.string.detail_success_added)
+
     val uiState by productDetailViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -61,19 +67,19 @@ fun ProductDetailScreen(
         productDetailViewModel.events.collect { event ->
             when (event) {
                 ProductDetailEvent.INSUFFICIENT_STOCK_ERROR -> {
-                    snackbarHostState.showSnackbar("No hay suficiente stock")
+                    snackbarHostState.showSnackbar(insufficientStockMessage)
                 }
 
                 ProductDetailEvent.NETWORK_ERROR -> {
-                    snackbarHostState.showSnackbar("No hay internet, compruebe su conexión")
+                    snackbarHostState.showSnackbar(networkErrorMessage)
                 }
 
                 ProductDetailEvent.UNKNOWN_ERROR -> {
-                    snackbarHostState.showSnackbar("Error inesperado, vuelva a intentarlo")
+                    snackbarHostState.showSnackbar(unknownErrorMessage)
                 }
 
                 ProductDetailEvent.SUCCESS_ADD_TO_CART -> {
-                    snackbarHostState.showSnackbar("Producto añadido")
+                    snackbarHostState.showSnackbar(successAddedMessage)
                 }
             }
         }
@@ -208,7 +214,10 @@ fun ProductDetailContent(
                                         color = MaterialTheme.colorScheme.errorContainer
                                     ) {
                                         Text(
-                                            "${(promotion as ProductPromotion.Percent).percent.toInt()}% OFF ",
+                                            stringResource(
+                                                R.string.detail_percent_off,
+                                                (promotion as ProductPromotion.Percent).percent.toInt()
+                                            ),
                                             modifier = Modifier.padding(
                                                 horizontal = 12.dp, vertical = 6.dp
                                             ),
@@ -232,7 +241,7 @@ fun ProductDetailContent(
                                         color = MaterialTheme.colorScheme.errorContainer
                                     ) {
                                         Text(
-                                            "PROMO: ${promotion.label}",
+                                            stringResource(R.string.detail_promo, promotion.label),
                                             modifier = Modifier.padding(
                                                 horizontal = 12.dp, vertical = 6.dp
                                             ),
@@ -263,7 +272,7 @@ fun ProductDetailContent(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        "Stock disponible",
+                                        stringResource(R.string.detail_stock_available),
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -273,7 +282,10 @@ fun ProductDetailContent(
                                         color = stockContainerColor
                                     ) {
                                         Text(
-                                            text = if (hasStock) "${product.stock} unidades" else "Sin stock",
+                                            text = if (hasStock) stringResource(
+                                                R.string.detail_stock_units,
+                                                product.stock
+                                            ) else stringResource(R.string.detail_no_stock),
                                             modifier = Modifier.padding(
                                                 horizontal = 12.dp, vertical = 6.dp
                                             ),

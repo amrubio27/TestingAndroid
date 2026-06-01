@@ -17,8 +17,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
+import com.amrubio27.cursotestingandroid.R
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_BADGE
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_CART
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR_FILTER
@@ -37,7 +39,7 @@ fun HomeTopAppBar(
     TopAppBar(
         title = {
             Text(
-                "MiniMarket",
+                stringResource(R.string.product_list_app_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = Bold
             )
@@ -53,7 +55,9 @@ fun HomeTopAppBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.FilterList,
-                    contentDescription = if (filtersVisible) "Ocultar filtros" else "Mostrar filtros",
+                    contentDescription = if (filtersVisible) stringResource(R.string.product_list_hide_filters) else stringResource(
+                        R.string.product_list_show_filters
+                    ),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
