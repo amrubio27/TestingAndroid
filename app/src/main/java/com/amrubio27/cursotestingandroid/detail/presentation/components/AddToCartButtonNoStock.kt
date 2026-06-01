@@ -17,8 +17,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.PRODUCT_DETAIL_ADD_TO_CART
 
 @Composable
 fun AddToCartButtonNoStock(modifier: Modifier = Modifier) {
@@ -27,7 +29,9 @@ fun AddToCartButtonNoStock(modifier: Modifier = Modifier) {
     ) {
         Box(Modifier.padding(16.dp)) {
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(PRODUCT_DETAIL_ADD_TO_CART),
                 onClick = {},
                 enabled = false,
                 shape = RoundedCornerShape(12.dp),

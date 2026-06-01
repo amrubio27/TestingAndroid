@@ -35,4 +35,8 @@ object UiTestTag {
     fun cartItem(productId: String) = "cart_item_$productId"
     fun cartQuantityIncrease(productId: String) = "cart_quantity_increase_$productId"
     fun cartQuantityDecrease(productId: String) = "cart_quantity_decrease_$productId"
+
+    // PRODUCT DETAIL
+    const val PRODUCT_DETAIL_LOADING = "product_detail_loading"
+    const val PRODUCT_DETAIL_ADD_TO_CART = "product_detail_add_to_cart"
 }
