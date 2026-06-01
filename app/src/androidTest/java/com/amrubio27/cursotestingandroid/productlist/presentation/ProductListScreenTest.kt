@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.amrubio27.cursotestingandroid.R
 import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.bread
 import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.coffee
 import com.amrubio27.cursotestingandroid.core.mothers.ProductMother.milk
@@ -57,6 +58,10 @@ class ProductListScreenTest {
         }
     }
 
+    private fun getString(resId: Int): String = composeRule.activity.getString(resId)
+    private fun getString(resId: Int, vararg formatArgs: Any): String =
+        composeRule.activity.getString(resId, *formatArgs)
+
     @Test
     fun givenLoadingState_whenRendered_thenShowsProgressView() {
         createProductListScreen(uiState = ProductListUiState.Loading)
@@ -68,14 +73,14 @@ class ProductListScreenTest {
     fun givenErrorState_whenRendered_thenShowsErrorMessage() {
         createProductListScreen(uiState = ProductListUiState.Error(""))
 
-        composeRule.onNodeWithText("ERROR").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.error_title)).assertIsDisplayed()
     }
 
     @Test
     fun givenSuccessState_whenRendered_thenShowsProductsAndCount() {
         createProductListScreen(uiState = ProductListUiStateMother.success())
 
-        composeRule.onNodeWithText("3 productos").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.product_list_count, 3)).assertIsDisplayed()
         composeRule.onNodeWithTag(testTag = FILTER_VIEW).assertIsDisplayed()
 
         composeRule.onNodeWithTag(testTag = productListItem(productId = coffee().id))
@@ -96,7 +101,7 @@ class ProductListScreenTest {
     fun givenSuccessState_whenRendered_thenShowsEmptyMessage() {
         createProductListScreen(uiState = ProductListUiStateMother.success(products = emptyList()))
 
-        composeRule.onNodeWithText("No se encontraron productos").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.product_list_no_products)).assertIsDisplayed()
     }
 
     @Test

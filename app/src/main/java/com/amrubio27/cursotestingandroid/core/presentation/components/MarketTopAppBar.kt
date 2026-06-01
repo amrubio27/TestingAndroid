@@ -12,7 +12,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.amrubio27.cursotestingandroid.R
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP_APP_BAR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +42,7 @@ fun MarketTopAppBar(
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.back_button_content_desc),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }

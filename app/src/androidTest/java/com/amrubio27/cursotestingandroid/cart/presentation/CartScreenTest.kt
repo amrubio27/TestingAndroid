@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeRight
+import com.amrubio27.cursotestingandroid.R
 import com.amrubio27.cursotestingandroid.cart.presentation.model.CartItemWithPromotion
 import com.amrubio27.cursotestingandroid.core.mothers.CartUiStateMother.cartItemWithPromotion
 import com.amrubio27.cursotestingandroid.core.mothers.CartUiStateMother.cartSuccess
@@ -51,6 +52,10 @@ class CartScreenTest {
         }
     }
 
+    private fun getString(resId: Int): String = composeRule.activity.getString(resId)
+    private fun getString(resId: Int, vararg formatArgs: Any): String =
+        composeRule.activity.getString(resId, *formatArgs)
+
     @Test
     fun givenLoadingState_whenRendered_thenShowProgressView() {
         createCartScreen(state = CartUiState.Loading)
@@ -65,7 +70,7 @@ class CartScreenTest {
 
         composeRule.onNodeWithText(errorText, substring = true, ignoreCase = true)
             .assertIsDisplayed()
-        composeRule.onNodeWithText("Reintentar").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.cart_retry_button)).assertIsDisplayed()
     }
 
     @Test
@@ -94,8 +99,8 @@ class CartScreenTest {
         )
 
         composeRule.onNodeWithTag(testTag = CART_EMPTY).assertIsDisplayed()
-        composeRule.onNodeWithText("Tu carrito está vacío").assertIsDisplayed()
-        composeRule.onNodeWithText("Agrega productos para comenzar").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.cart_empty_title)).assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.cart_empty_subtitle)).assertIsDisplayed()
     }
 
     @Test
@@ -104,9 +109,9 @@ class CartScreenTest {
 
         composeRule.onNodeWithText(coffee().name).assertIsDisplayed()
         composeRule.onNodeWithText(bread().name).assertIsDisplayed()
-        composeRule.onNodeWithText("Subtotal:").assertIsDisplayed()
-        composeRule.onNodeWithText("Descuento:").assertIsDisplayed()
-        composeRule.onNodeWithText("Total:").assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.cart_subtotal_label)).assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.cart_discount_label)).assertIsDisplayed()
+        composeRule.onNodeWithText(getString(R.string.cart_total_label)).assertIsDisplayed()
 
         composeRule.onNodeWithTag(testTag = cartItem(productId = coffee().id)).assertIsDisplayed()
         composeRule.onNodeWithTag(testTag = cartItem(productId = bread().id)).assertIsDisplayed()

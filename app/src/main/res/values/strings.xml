@@ -1,11 +1,63 @@
 <resources>
     <string name="app_name">CursoTestingAndroid</string>
 
+    <!-- General -->
+    <string name="back_button_content_desc">Atrás</string>
+    <string name="error_title">ERROR</string>
+
     <!-- Settings -->
     <string name="settings_title">Ajustes</string>
     <string name="settings_filters_section">Filtros y visualización</string>
     <string name="settings_in_stock_only">Solo productos en Stock</string>
+    <string name="settings_in_stock_only_desc">Muestra únicamente productos disponibles</string>
+    <string name="settings_show_taxes">Mostrar impuestos incluídos</string>
+    <string name="settings_show_taxes_desc">Incluir impuestos de los precios mostrados</string>
     <string name="settings_appearance_section">Apariencia</string>
     <string name="settings_theme_label">Tema de la aplicación</string>
+    <string name="settings_theme_desc">Elige entre modo claro, oscuro o seguir el sistema</string>
+    <string name="settings_theme_system">Sistema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
+
+    <!-- Product List -->
+    <string name="product_list_count">%1$d productos</string>
+    <string name="product_list_no_products">No se encontraron productos</string>
+    <string name="product_list_category_all">Todas</string>
+    <string name="product_list_sort_title_categories">Categorías</string>
+    <string name="product_list_sort_title">Ordenar por</string>
+    <string name="product_list_sort_price_asc">Precio ↑</string>
+    <string name="product_list_sort_price_desc">Precio ↓</string>
+    <string name="product_list_sort_discount">Descuento</string>
+    <string name="product_list_app_title">MiniMarket</string>
+    <string name="product_list_hide_filters">Ocultar filtros</string>
+    <string name="product_list_show_filters">Mostrar filtros</string>
+    <string name="product_list_price_before">Antes</string>
+    <string name="product_list_price_now">Ahora</string>
+
+    <!-- Product Detail -->
+    <string name="detail_no_stock_available">Sin stock disponible</string>
+    <string name="detail_error_insufficient_stock">No hay suficiente stock</string>
+    <string name="detail_error_network">No hay internet, compruebe su conexión</string>
+    <string name="detail_error_unknown">Error inesperado, vuelva a intentarlo</string>
+    <string name="detail_success_added">Producto añadido</string>
+    <string name="detail_percent_off">%1$d%% OFF</string>
+    <string name="detail_promo">PROMO: %1$s</string>
+    <string name="detail_stock_available">Stock disponible</string>
+    <string name="detail_stock_units">%1$d unidades</string>
+    <string name="detail_no_stock">Sin stock</string>
+    <string name="detail_add_to_cart">Agregar al carrito</string>
+
+    <!-- Cart -->
+    <string name="cart_title">Carrito</string>
+    <string name="cart_error_message">Error: %1$s</string>
+    <string name="cart_retry_button">Reintentar</string>
+    <string name="cart_empty_title">Tu carrito está vacío</string>
+    <string name="cart_empty_subtitle">Agrega productos para comenzar</string>
+    <string name="cart_summary_title">Resumen del carrito</string>
+    <string name="cart_subtotal_label">Subtotal:</string>
+    <string name="cart_discount_label">Descuento:</string>
+    <string name="cart_total_label">Total:</string>
+    <string name="cart_price_per_unit">%1$s c/u</string>
+    <string name="cart_item_total">Total: %1$s</string>
 
 </resources>

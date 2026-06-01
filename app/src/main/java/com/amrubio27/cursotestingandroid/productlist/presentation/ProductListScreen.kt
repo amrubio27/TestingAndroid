@@ -26,10 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.amrubio27.cursotestingandroid.R
 import com.amrubio27.cursotestingandroid.cart.presentation.CartUiState
 import com.amrubio27.cursotestingandroid.cart.presentation.CartViewModel
 import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.PRODUCT_LIST_LIST
@@ -136,7 +138,7 @@ fun ProductListContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "ERROR",
+                        stringResource(R.string.error_title),
                         fontSize = 30.sp,
                         color = Color.Red
                     )
@@ -163,7 +165,7 @@ fun ProductListContent(
                     }
 
                     Text(
-                        "${uiState.products.size} productos",
+                        stringResource(R.string.product_list_count, uiState.products.size),
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary
@@ -181,7 +183,7 @@ fun ProductListContent(
                             ) {
                                 Text("🔍", style = MaterialTheme.typography.displayMedium)
                                 Text(
-                                    "No se encontraron productos",
+                                    stringResource(R.string.product_list_no_products),
                                     style = MaterialTheme.typography.titleLarge,
                                     color = MaterialTheme.colorScheme.tertiary
                                 )
