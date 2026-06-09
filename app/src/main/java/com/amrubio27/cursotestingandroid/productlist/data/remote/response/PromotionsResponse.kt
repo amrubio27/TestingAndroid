@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PromotionsResponse(
     @SerialName("promotions")
-    val promotions: List<PromotionResponse>
+    val promotions: List<PromotionResponse>,
 )
 
 @Serializable
@@ -26,5 +26,5 @@ data class PromotionResponse(
     @SerialName("startAtEpoch")
     val startAtEpoch: Long? = null,
     @SerialName("endAtEpoch")
-    val endAtEpoch: Long? = null
+    val endAtEpoch: Long? = null,
 )

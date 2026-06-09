@@ -49,7 +49,7 @@ fun ProductListScreen(
     productListViewModel: ProductListViewModel = hiltViewModel(),
     navigateToSettings: () -> Unit,
     navigateToProductDetail: (String) -> Unit,
-    navigateToCart: () -> Unit
+    navigateToCart: () -> Unit,
 ) {
     val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
     val cartUiState by cartViewModel.uiState.collectAsStateWithLifecycle()
@@ -66,15 +66,16 @@ fun ProductListScreen(
         }
     }
 
-    val cartItemCount = remember(cartUiState) {
-        when (val state = cartUiState) {
-            is CartUiState.Success -> {
-                state.cartItems.sumOf { it.cartItem.quantity }
-            }
+    val cartItemCount =
+        remember(cartUiState) {
+            when (val state = cartUiState) {
+                is CartUiState.Success -> {
+                    state.cartItems.sumOf { it.cartItem.quantity }
+                }
 
-            else -> 0
+                else -> 0
+            }
         }
-    }
 
     ProductListContent(
         uiState = uiState,
@@ -86,7 +87,7 @@ fun ProductListScreen(
         onCartSelected = navigateToCart,
         onCategorySelected = { category -> productListViewModel.setCategory(category) },
         onSortOptionSelected = { sortOption -> productListViewModel.setSortOption(sortOption) },
-        onProductSelected = { productWithPromotion -> navigateToProductDetail(productWithPromotion.product.id) }
+        onProductSelected = { productWithPromotion -> navigateToProductDetail(productWithPromotion.product.id) },
     )
 }
 
@@ -102,8 +103,7 @@ fun ProductListContent(
     onCartSelected: () -> Unit,
     onCategorySelected: (String?) -> Unit,
     onSortOptionSelected: (SortOption) -> Unit,
-    onProductSelected: (ProductWithPromotion) -> Unit
-
+    onProductSelected: (ProductWithPromotion) -> Unit,
 ) {
     Scaffold(
         modifier = modifier,
@@ -113,10 +113,10 @@ fun ProductListContent(
                 onFilterSelected = { showFilters -> onFilterSelected(showFilters) },
                 onSettingsSelected = { onSettingsSelected() },
                 onCartSelected = onCartSelected,
-                cartItemCount = cartItemCount
+                cartItemCount = cartItemCount,
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         when (uiState) {
             ProductListUiState.Loading -> {
@@ -124,7 +124,7 @@ fun ProductListContent(
                     Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(modifier = Modifier.testTag(PRODUCT_LIST_LOADING))
                 }
@@ -135,12 +135,12 @@ fun ProductListContent(
                     Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         stringResource(R.string.error_title),
                         fontSize = 30.sp,
-                        color = Color.Red
+                        color = Color.Red,
                     )
                 }
             }
@@ -149,18 +149,18 @@ fun ProductListContent(
                 Column(
                     Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .padding(paddingValues),
                 ) {
                     AnimatedVisibility(
                         visible = filtersVisible,
                         enter = expandVertically() + fadeIn(),
-                        exit = shrinkVertically() + fadeOut()
+                        exit = shrinkVertically() + fadeOut(),
                     ) {
                         FiltersMenu(
                             state = uiState,
                             onCategorySelected =
                                 onCategorySelected,
-                            onSortSelected = onSortOptionSelected
+                            onSortSelected = onSortOptionSelected,
                         )
                     }
 
@@ -168,35 +168,35 @@ fun ProductListContent(
                         stringResource(R.string.product_list_count, uiState.products.size),
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.secondary,
                     )
                     if (uiState.products.isEmpty()) {
                         Box(
                             Modifier
                                 .fillMaxSize()
                                 .padding(32.dp),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 Text("🔍", style = MaterialTheme.typography.displayMedium)
                                 Text(
                                     stringResource(R.string.product_list_no_products),
                                     style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.tertiary
+                                    color = MaterialTheme.colorScheme.tertiary,
                                 )
                             }
                         }
                     } else {
                         LazyColumn(
-                            modifier = Modifier.testTag(PRODUCT_LIST_LIST)
+                            modifier = Modifier.testTag(PRODUCT_LIST_LIST),
                         ) {
                             items(uiState.products) { item: ProductWithPromotion ->
                                 ProductItem(
                                     item = item,
-                                    onClick = onProductSelected
+                                    onClick = onProductSelected,
                                 )
                             }
                         }
@@ -205,5 +205,4 @@ fun ProductListContent(
             }
         }
     }
-
 }

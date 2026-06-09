@@ -16,23 +16,24 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val themeMode by mainViewModel.themeMode.collectAsStateWithLifecycle(
-                initialValue = ThemeMode.SYSTEM
+                initialValue = ThemeMode.SYSTEM,
             )
 
-            val darkTheme = when (themeMode) {
-                ThemeMode.SYSTEM -> isSystemInDarkTheme()
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-
-            }
+            val darkTheme =
+                when (themeMode) {
+                    ThemeMode.SYSTEM -> isSystemInDarkTheme()
+                    ThemeMode.LIGHT -> false
+                    ThemeMode.DARK -> true
+                }
 
             CursoTestingAndroidTheme(
-                darkTheme = darkTheme
+                darkTheme = darkTheme,
             ) {
                 NavGraph()
             }

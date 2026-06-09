@@ -18,16 +18,17 @@ object CartUiStateMother {
                 cartItemWithPromotion(product = bread(), quantity = 2),
                 cartItemWithPromotion(product = coffee(), quantity = 1, promotion = percent()),
             ),
-        summary: CartSummary = CartSummary(
-            subtotal = 10.3,
-            discountTotal = 0.7,
-            finalTotal = 11.0
-        ),
-        isLoading: Boolean = false
+        summary: CartSummary =
+            CartSummary(
+                subtotal = 10.3,
+                discountTotal = 0.7,
+                finalTotal = 11.0,
+            ),
+        isLoading: Boolean = false,
     ) = CartUiState.Success(
         summary = summary,
         isLoading = isLoading,
-        cartItems = cartItems
+        cartItems = cartItems,
     )
 
     fun cartItemWithPromotion(
@@ -36,7 +37,6 @@ object CartUiStateMother {
         promotion: ProductPromotion? = null,
     ) = CartItemWithPromotion(
         cartItem = CartItem(productId = product.id, quantity = quantity),
-        item = ProductWithPromotion(product, promotion)
+        item = ProductWithPromotion(product, promotion),
     )
-
 }

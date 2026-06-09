@@ -19,23 +19,24 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class ProductRepositoryImpl @Inject constructor(
+class ProductRepositoryImpl
+@Inject
+constructor(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
-    private val dispatchersProvider: DispatchersProvider
+    private val dispatchersProvider: DispatchersProvider,
 ) : ProductRepository {
     private val refreshScope = CoroutineScope(SupervisorJob() + dispatchersProvider.io)
     private val refreshMutex = Mutex()
 
-
     override fun getProducts(): Flow<List<Product>> {
-        return localDataSource.getAllProducts()
+        return localDataSource
+            .getAllProducts()
             .map { entities ->
                 entities.mapNotNull {
                     it.toDomain()
                 }
-            }
-            .onStart {
+            }.onStart {
                 refreshScope.launch {
                     if (!refreshMutex.tryLock()) return@launch
                     try {
@@ -44,24 +45,20 @@ class ProductRepositoryImpl @Inject constructor(
                     } finally {
                         refreshMutex.unlock()
                     }
-
                 }
-            }
-            .catch {
-                //Log
+            }.catch {
+                // Log
             }
     }
 
-    override fun getProductById(id: String): Flow<Product?> {
-        return localDataSource.getProductById(id)
+    override fun getProductById(id: String): Flow<Product?> =
+        localDataSource
+            .getProductById(id)
             .map { entity ->
                 entity?.toDomain()
+            }.catch { e ->
+                // Log or analitics
             }
-            .catch { e ->
-                //Log or analitics
-
-            }
-    }
 
     private suspend fun refreshProductsInternal() {
         withContext(dispatchersProvider.io) {
@@ -77,12 +74,12 @@ class ProductRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getProductsByIds(ids: Set<String>): Flow<List<Product>> {
-        return localDataSource.getProductsByIds(ids)
+    override fun getProductsByIds(ids: Set<String>): Flow<List<Product>> =
+        localDataSource
+            .getProductsByIds(ids)
             .map { entities ->
                 entities.mapNotNull {
                     it.toDomain()
                 }
             }
     }
-}

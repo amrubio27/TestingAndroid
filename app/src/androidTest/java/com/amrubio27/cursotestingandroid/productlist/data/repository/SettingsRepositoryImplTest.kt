@@ -33,10 +33,11 @@ class SettingsRepositoryImplTest {
     lateinit var settingsRepository: SettingsRepository
 
     @Before
-    fun setUp() = runTest {
-        hilt.inject()
-        (settingsRepository as? SettingsRepositoryImpl)?.clear()
-    }
+    fun setUp() =
+        runTest {
+            hilt.inject()
+            (settingsRepository as? SettingsRepositoryImpl)?.clear()
+        }
 
     @After
     fun tearDown() {
@@ -44,54 +45,59 @@ class SettingsRepositoryImplTest {
     }
 
     @Test
-    fun givenNoDataSaved_whenInStockOnlyIsRead_thenReturnsDefaultFalse() = runTest {
-        val result: Boolean = settingsRepository.inStockOnly.first()
-        assertTrue(!result)
-    }
+    fun givenNoDataSaved_whenInStockOnlyIsRead_thenReturnsDefaultFalse() =
+        runTest {
+            val result: Boolean = settingsRepository.inStockOnly.first()
+            assertTrue(!result)
+        }
 
     @Test
-    fun givenNoDataSaved_whenFilterVisibleIsRead_thenReturnsDefaultTrue() = runTest {
-        val result: Boolean = settingsRepository.filtersVisible.first()
-        assertTrue(result)
-    }
+    fun givenNoDataSaved_whenFilterVisibleIsRead_thenReturnsDefaultTrue() =
+        runTest {
+            val result: Boolean = settingsRepository.filtersVisible.first()
+            assertTrue(result)
+        }
 
     @Test
-    fun givenNoDataSaved_whenSelectCategoryIsRead_thenReturnsDefaultNull() = runTest {
-        val result: String? = settingsRepository.selectedCategory.first()
-        assertNull(result)
-    }
+    fun givenNoDataSaved_whenSelectCategoryIsRead_thenReturnsDefaultNull() =
+        runTest {
+            val result: String? = settingsRepository.selectedCategory.first()
+            assertNull(result)
+        }
 
     @Test
-    fun givenNoDataSaved_whenThemeModeIsRead_thenReturnsDefaultSystem() = runTest {
-        assertEquals(ThemeMode.SYSTEM, settingsRepository.themeMode.first())
-    }
+    fun givenNoDataSaved_whenThemeModeIsRead_thenReturnsDefaultSystem() =
+        runTest {
+            assertEquals(ThemeMode.SYSTEM, settingsRepository.themeMode.first())
+        }
 
     @Test
-    fun givenNoDataSaved_whenSortOptionIsRead_thenReturnsDefaultSystem() = runTest {
-        assertEquals(SortOption.NONE, settingsRepository.sortOption.first())
-    }
+    fun givenNoDataSaved_whenSortOptionIsRead_thenReturnsDefaultSystem() =
+        runTest {
+            assertEquals(SortOption.NONE, settingsRepository.sortOption.first())
+        }
 
     @Test
-    fun givenRepository_whenSetFilterVisibleToFalse_thenPersistValue() = runTest {
-        settingsRepository.setFiltersVisible(false)
-        val result: Boolean = settingsRepository.filtersVisible.first()
-        assertTrue(!result)
-    }
+    fun givenRepository_whenSetFilterVisibleToFalse_thenPersistValue() =
+        runTest {
+            settingsRepository.setFiltersVisible(false)
+            val result: Boolean = settingsRepository.filtersVisible.first()
+            assertTrue(!result)
+        }
 
     @Test
-    fun givenMultipleSettingsChanges_whenReadAll_thenStateIsConsistent() = runTest {
-        settingsRepository.setFiltersVisible(false)
-        settingsRepository.setInStockOnly(true)
-        settingsRepository.setSortOption(SortOption.DISCOUNT)
-        settingsRepository.setThemeMode(ThemeMode.DARK)
-        settingsRepository.setSelectedCategory("papas")
+    fun givenMultipleSettingsChanges_whenReadAll_thenStateIsConsistent() =
+        runTest {
+            settingsRepository.setFiltersVisible(false)
+            settingsRepository.setInStockOnly(true)
+            settingsRepository.setSortOption(SortOption.DISCOUNT)
+            settingsRepository.setThemeMode(ThemeMode.DARK)
+            settingsRepository.setSelectedCategory("papas")
 
-        assertTrue(!settingsRepository.filtersVisible.first())
-        assertEquals(ThemeMode.DARK, settingsRepository.themeMode.first())
-        assertEquals("papas", settingsRepository.selectedCategory.first())
-        assertEquals(SortOption.DISCOUNT, settingsRepository.sortOption.first())
-        assertEquals(true, settingsRepository.inStockOnly.first())
-    }
-
-
+            assertTrue(!settingsRepository.filtersVisible.first())
+            assertEquals(ThemeMode.DARK, settingsRepository.themeMode.first())
+            assertEquals("papas", settingsRepository.selectedCategory.first())
+            assertEquals(SortOption.DISCOUNT, settingsRepository.sortOption.first())
+            assertEquals(true, settingsRepository.inStockOnly.first())
+        }
 }

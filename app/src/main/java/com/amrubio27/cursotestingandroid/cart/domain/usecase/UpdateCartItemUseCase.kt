@@ -6,13 +6,16 @@ import com.amrubio27.cursotestingandroid.productlist.domain.repository.ProductRe
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class UpdateCartItemUseCase @Inject constructor(
+class UpdateCartItemUseCase
+@Inject
+constructor(
     private val cartItemRepository: CartItemRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
 ) {
-
-    suspend operator fun invoke(productId: String, quantity: Int) {
-
+    suspend operator fun invoke(
+        productId: String,
+        quantity: Int,
+    ) {
         if (quantity < 0) {
             throw AppError.Validation.QuantityMustBePositive
         }
@@ -22,14 +25,14 @@ class UpdateCartItemUseCase @Inject constructor(
             return
         }
 
-        val product = productRepository.getProductById(productId).first()
-            ?: throw AppError.NotFoundError
+        val product =
+            productRepository.getProductById(productId).first()
+                ?: throw AppError.NotFoundError
 
         if (quantity > product.stock) {
             throw AppError.Validation.InsufficientStock(product.stock)
         }
 
         cartItemRepository.updateQuantity(productId, quantity)
-
     }
 }

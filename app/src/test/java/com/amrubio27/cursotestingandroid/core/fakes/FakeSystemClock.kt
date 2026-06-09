@@ -3,7 +3,7 @@ package com.amrubio27.cursotestingandroid.core.fakes
 import com.amrubio27.cursotestingandroid.core.domain.util.Clock
 import java.time.Instant
 
-class FakeSystemClock() : Clock {
+class FakeSystemClock : Clock {
     private var currentTime: Instant = Instant.now()
 
     override fun now(): Instant = currentTime

@@ -27,32 +27,38 @@ import com.amrubio27.cursotestingandroid.productlist.domain.model.Product
 
 @Composable
 fun AddToCartButtonWithStock(
-    modifier: Modifier = Modifier, product: Product, isLoading: Boolean, addToCart: () -> Unit
+    modifier: Modifier = Modifier,
+    product: Product,
+    isLoading: Boolean,
+    addToCart: () -> Unit,
 ) {
     Surface(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth(),
         shadowElevation = 8.dp,
-        tonalElevation = 2.dp
+        tonalElevation = 2.dp,
     ) {
         Box(Modifier.padding(16.dp)) {
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(PRODUCT_DETAIL_ADD_TO_CART),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(PRODUCT_DETAIL_ADD_TO_CART),
                 onClick = { addToCart() },
                 enabled = !isLoading,
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             ) {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    stringResource(R.string.detail_add_to_cart), fontWeight = FontWeight.Bold
+                    stringResource(R.string.detail_add_to_cart),
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }

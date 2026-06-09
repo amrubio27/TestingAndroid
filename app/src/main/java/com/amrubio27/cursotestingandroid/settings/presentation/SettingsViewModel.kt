@@ -13,20 +13,22 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val settingsRepository: SettingsRepository
+class SettingsViewModel
+@Inject
+constructor(
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
-
-    val uiState: StateFlow<SettingsUiState> = combine(
-        settingsRepository.inStockOnly,
-        settingsRepository.themeMode
-    ) { inStockOnly, themeMode ->
-        SettingsUiState(inStockOnly, themeMode)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = SettingsUiState()
-    )
+    val uiState: StateFlow<SettingsUiState> =
+        combine(
+            settingsRepository.inStockOnly,
+            settingsRepository.themeMode,
+        ) { inStockOnly, themeMode ->
+            SettingsUiState(inStockOnly, themeMode)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = SettingsUiState(),
+        )
 
     fun setInStockOnly(newState: Boolean) {
         viewModelScope.launch {

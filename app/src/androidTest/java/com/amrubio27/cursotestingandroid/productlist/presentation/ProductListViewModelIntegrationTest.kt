@@ -29,7 +29,6 @@ import javax.inject.Inject
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class ProductListViewModelIntegrationTest {
-
     private companion object {
         const val EXPECTED_PRODUCT_SIZE = 3
         const val DAIRY_CATEGORY = "Lácteos"
@@ -57,15 +56,17 @@ class ProductListViewModelIntegrationTest {
     lateinit var productRepository: ProductRepository
 
     @Before
-    fun setUp() = runTest {
-        mockWebServer.server.dispatcher = MiniMarketApiDispatcher(
-            productJson = "products_list_default.json".asAsset()
-        )
-        hilt.inject()
-        (settingsRepository as? SettingsRepositoryImpl)?.clear()
-        productRepository.refreshProducts()
-        promotionRepository.refreshPromotions()
-    }
+    fun setUp() =
+        runTest {
+            mockWebServer.server.dispatcher =
+                MiniMarketApiDispatcher(
+                    productJson = "products_list_default.json".asAsset(),
+                )
+            hilt.inject()
+            (settingsRepository as? SettingsRepositoryImpl)?.clear()
+            productRepository.refreshProducts()
+            promotionRepository.refreshPromotions()
+        }
 
     @After
     fun tearDown() {
@@ -73,19 +74,20 @@ class ProductListViewModelIntegrationTest {
     }
 
     @Test
-    fun givenSuccessfulApi_whenViewModelLoads_thenShowsProducts() = runTest {
-        val viewModel = ProductListViewModel(getProductsUseCase, settingsRepository)
+    fun givenSuccessfulApi_whenViewModelLoads_thenShowsProducts() =
+        runTest {
+            val viewModel = ProductListViewModel(getProductsUseCase, settingsRepository)
 
-        viewModel.uiState.test {
-            val result: ProductListUiState.Success = awaitSuccessMatching { it.products.size == 3 }
-            assertTrue(result.products.isNotEmpty())
-            assertTrue(result.products.size == 3)
-            cancelAndIgnoreRemainingEvents()
+            viewModel.uiState.test {
+                val result: ProductListUiState.Success = awaitSuccessMatching { it.products.size == 3 }
+                assertTrue(result.products.isNotEmpty())
+                assertTrue(result.products.size == 3)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     private suspend fun ReceiveTurbine<ProductListUiState>.awaitSuccessMatching(
-        predicate: (ProductListUiState.Success) -> Boolean
+        predicate: (ProductListUiState.Success) -> Boolean,
     ): ProductListUiState.Success {
         while (true) {
             when (val item: ProductListUiState = awaitItem()) {
@@ -97,49 +99,59 @@ class ProductListViewModelIntegrationTest {
     }
 
     @Test
-    fun givenDairyCategorySelected_whenFiltering_thenOnlyDairyProductAreShown() = runTest {
-        val viewModel = ProductListViewModel(getProductsUseCase, settingsRepository)
+    fun givenDairyCategorySelected_whenFiltering_thenOnlyDairyProductAreShown() =
+        runTest {
+            val viewModel = ProductListViewModel(getProductsUseCase, settingsRepository)
 
-        viewModel.uiState.test {
-            // espera a que carguen inicialmente los productos
-            awaitSuccessMatching { it.products.size == EXPECTED_PRODUCT_SIZE }
+            viewModel.uiState.test {
+                // espera a que carguen inicialmente los productos
+                awaitSuccessMatching { it.products.size == EXPECTED_PRODUCT_SIZE }
 
-            // selecciona la categoría de lácteos
-            viewModel.setCategory(DAIRY_CATEGORY)
+                // selecciona la categoría de lácteos
+                viewModel.setCategory(DAIRY_CATEGORY)
 
-            val result: ProductListUiState.Success = awaitSuccessMatching { state ->
-                state.selectedCategory == DAIRY_CATEGORY &&
-                        state.products.isNotEmpty() &&
-                        state.products.all { it.product.category == DAIRY_CATEGORY }
+                val result: ProductListUiState.Success =
+                    awaitSuccessMatching { state ->
+                        state.selectedCategory == DAIRY_CATEGORY &&
+                            state.products.isNotEmpty() &&
+                            state.products.all { it.product.category == DAIRY_CATEGORY }
+                    }
+
+                assertTrue(result.products.size == 2)
+                assertTrue(result.products.all { it.product.category == DAIRY_CATEGORY })
+                cancelAndIgnoreRemainingEvents()
             }
-
-            assertTrue(result.products.size == 2)
-            assertTrue(result.products.all { it.product.category == DAIRY_CATEGORY })
-            cancelAndIgnoreRemainingEvents()
         }
-    }
 
     @Test
-    fun givenProductsLoaded_whenSortingByPriceAsc_thenListIsCorrectlyOrdered() = runTest {
-        val viewModel = ProductListViewModel(getProductsUseCase, settingsRepository)
+    fun givenProductsLoaded_whenSortingByPriceAsc_thenListIsCorrectlyOrdered() =
+        runTest {
+            val viewModel = ProductListViewModel(getProductsUseCase, settingsRepository)
 
-        viewModel.uiState.test {
-            // espera a que carguen inicialmente los productos
-            awaitSuccessMatching { it.products.size == EXPECTED_PRODUCT_SIZE }
+            viewModel.uiState.test {
+                // espera a que carguen inicialmente los productos
+                awaitSuccessMatching { it.products.size == EXPECTED_PRODUCT_SIZE }
 
-            // aplica el orden ascendente por precio
-            viewModel.setSortOption(SortOption.PRICE_ASC)
+                // aplica el orden ascendente por precio
+                viewModel.setSortOption(SortOption.PRICE_ASC)
 
-            val result: ProductListUiState.Success = awaitSuccessMatching { state ->
-                state.sortOption == SortOption.PRICE_ASC &&
-                        state.products.map { it.product.price } == state.products.map { it.product.price }
-                    .sorted()
+                val result: ProductListUiState.Success =
+                    awaitSuccessMatching { state ->
+                        state.sortOption == SortOption.PRICE_ASC &&
+                            state.products.map { it.product.price } ==
+                            state.products
+                                .map { it.product.price }
+                                .sorted()
+                    }
+
+                assertEquals(
+                    10.0,
+                    result.products
+                        .first()
+                        .product.price,
+                )
+                assertEquals(listOf(10.0, 15.0, 20.0), result.products.map { it.product.price })
+                cancelAndIgnoreRemainingEvents()
             }
-
-            assertEquals(10.0, result.products.first().product.price)
-            assertEquals(listOf(10.0, 15.0, 20.0), result.products.map { it.product.price })
-            cancelAndIgnoreRemainingEvents()
         }
-    }
-
 }

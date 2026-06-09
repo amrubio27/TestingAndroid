@@ -13,9 +13,7 @@ class FakePromotionRepository : PromotionRepository {
         _promotions.value = promotions
     }
 
-    override fun getActivePromotions(): Flow<List<Promotion>> {
-        return _promotions.asStateFlow()
-    }
+    override fun getActivePromotions(): Flow<List<Promotion>> = _promotions.asStateFlow()
 
     override suspend fun refreshPromotions() {
     }

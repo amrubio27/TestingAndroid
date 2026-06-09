@@ -16,14 +16,16 @@ class FakeCartItemRepository : CartItemRepository {
 
     override fun getCartItems(): Flow<List<CartItem>> = _cartItems.asStateFlow()
 
-    override suspend fun addToCart(productId: String, quantity: Int) {
+    override suspend fun addToCart(
+        productId: String,
+        quantity: Int,
+    ) {
         val currentItems = _cartItems.value.toMutableList()
         val existingItem = currentItems.indexOfFirst { it.productId == productId }
 
         if (existingItem >= 0) {
             val item = currentItems[existingItem]
             currentItems[existingItem] = item.copy(quantity = item.quantity + quantity)
-
         } else {
             currentItems.add(CartItem(productId, quantity))
         }
@@ -42,7 +44,10 @@ class FakeCartItemRepository : CartItemRepository {
         }
     }
 
-    override suspend fun updateQuantity(productId: String, quantity: Int) {
+    override suspend fun updateQuantity(
+        productId: String,
+        quantity: Int,
+    ) {
         val currentItems = _cartItems.value.toMutableList()
         val existingItem = currentItems.indexOfFirst { it.productId == productId }
 
@@ -58,7 +63,6 @@ class FakeCartItemRepository : CartItemRepository {
         _cartItems.value = emptyList()
     }
 
-    override suspend fun getCartItemById(productId: String): CartItem? {
-        return _cartItems.value.find { it.productId == productId }
-    }
+    override suspend fun getCartItemById(productId: String): CartItem? =
+        _cartItems.value.find { it.productId == productId }
 }

@@ -27,26 +27,30 @@ import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.PRO
 @Composable
 fun AddToCartButtonNoStock(modifier: Modifier = Modifier) {
     Surface(
-        modifier = modifier.fillMaxWidth(), shadowElevation = 8.dp, tonalElevation = 2.dp
+        modifier = modifier.fillMaxWidth(),
+        shadowElevation = 8.dp,
+        tonalElevation = 2.dp,
     ) {
         Box(Modifier.padding(16.dp)) {
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(PRODUCT_DETAIL_ADD_TO_CART),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(PRODUCT_DETAIL_ADD_TO_CART),
                 onClick = {},
                 enabled = false,
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(disabledContainerColor = MaterialTheme.colorScheme.errorContainer)
+                colors = ButtonDefaults.buttonColors(disabledContainerColor = MaterialTheme.colorScheme.errorContainer),
             ) {
                 Icon(
                     imageVector = Icons.Default.Warning,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    stringResource(R.string.detail_no_stock_available), fontWeight = FontWeight.Bold
+                    stringResource(R.string.detail_no_stock_available),
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }

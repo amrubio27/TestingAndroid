@@ -28,7 +28,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class CartScreenTest {
-
     @get:Rule
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
@@ -38,7 +37,7 @@ class CartScreenTest {
         onRetrySelected: () -> Unit = {},
         onIncreaseQuantity: (String, Int) -> Unit = { _, _ -> },
         onDecreaseQuantity: (String, Int) -> Unit = { _, _ -> },
-        onRemove: (String) -> Unit = {}
+        onRemove: (String) -> Unit = {},
     ) {
         composeRule.setContent {
             CartContent(
@@ -47,14 +46,17 @@ class CartScreenTest {
                 onRetrySelected = onRetrySelected,
                 onRemove = onRemove,
                 onDecreaseQuantity = onDecreaseQuantity,
-                onIncreaseQuantity = onIncreaseQuantity
+                onIncreaseQuantity = onIncreaseQuantity,
             )
         }
     }
 
     private fun getString(resId: Int): String = composeRule.activity.getString(resId)
-    private fun getString(resId: Int, vararg formatArgs: Any): String =
-        composeRule.activity.getString(resId, *formatArgs)
+
+    private fun getString(
+        resId: Int,
+        vararg formatArgs: Any,
+    ): String = composeRule.activity.getString(resId, *formatArgs)
 
     @Test
     fun givenLoadingState_whenRendered_thenShowProgressView() {
@@ -68,7 +70,8 @@ class CartScreenTest {
         val errorText = "Prueba error"
         createCartScreen(state = CartUiState.Error(errorText))
 
-        composeRule.onNodeWithText(errorText, substring = true, ignoreCase = true)
+        composeRule
+            .onNodeWithText(errorText, substring = true, ignoreCase = true)
             .assertIsDisplayed()
         composeRule.onNodeWithText(getString(R.string.cart_retry_button)).assertIsDisplayed()
     }
@@ -80,7 +83,7 @@ class CartScreenTest {
         val errorText = "Prueba error"
         createCartScreen(
             state = CartUiState.Error(errorText),
-            onRetrySelected = { retryClicked = true }
+            onRetrySelected = { retryClicked = true },
         )
 
         composeRule.onNodeWithTag(testTag = CART_RETRY).performClick()
@@ -91,11 +94,12 @@ class CartScreenTest {
     @Test
     fun givenEmptySuccessState_whenRendered_thenShowsEmptyCartMessage() {
         createCartScreen(
-            state = CartUiState.Success(
-                summary = null,
-                isLoading = false,
-                cartItems = emptyList()
-            )
+            state =
+                CartUiState.Success(
+                    summary = null,
+                    isLoading = false,
+                    cartItems = emptyList(),
+                ),
         )
 
         composeRule.onNodeWithTag(testTag = CART_EMPTY).assertIsDisplayed()
@@ -123,18 +127,23 @@ class CartScreenTest {
         val initialQuantity = 2
 
         createCartScreen(
-            state = cartSuccess(
-                cartItems = listOf(
-                    cartItemWithPromotion(
-                        product = bread(), quantity = initialQuantity
-                    )
-                )
-            ),
-            onIncreaseQuantity = { productId, quantity -> emitted = productId to quantity }
+            state =
+                cartSuccess(
+                    cartItems =
+                        listOf(
+                            cartItemWithPromotion(
+                                product = bread(),
+                                quantity = initialQuantity,
+                            ),
+                        ),
+                ),
+            onIncreaseQuantity = { productId, quantity -> emitted = productId to quantity },
         )
 
-        composeRule.onNodeWithTag(testTag = cartQuantityIncrease(productId = bread().id))
-            .assertIsEnabled().performClick()
+        composeRule
+            .onNodeWithTag(testTag = cartQuantityIncrease(productId = bread().id))
+            .assertIsEnabled()
+            .performClick()
 
         assertEquals(expected = bread().id to (initialQuantity), actual = emitted)
     }
@@ -145,18 +154,23 @@ class CartScreenTest {
         val initialQuantity = 3
 
         createCartScreen(
-            state = cartSuccess(
-                cartItems = listOf(
-                    cartItemWithPromotion(
-                        product = bread(), quantity = initialQuantity
-                    )
-                )
-            ),
-            onDecreaseQuantity = { productId, quantity -> emitted = productId to quantity }
+            state =
+                cartSuccess(
+                    cartItems =
+                        listOf(
+                            cartItemWithPromotion(
+                                product = bread(),
+                                quantity = initialQuantity,
+                            ),
+                        ),
+                ),
+            onDecreaseQuantity = { productId, quantity -> emitted = productId to quantity },
         )
 
-        composeRule.onNodeWithTag(testTag = cartQuantityDecrease(productId = bread().id))
-            .assertIsEnabled().performClick()
+        composeRule
+            .onNodeWithTag(testTag = cartQuantityDecrease(productId = bread().id))
+            .assertIsEnabled()
+            .performClick()
 
         assertEquals(expected = bread().id to (initialQuantity), actual = emitted)
     }
@@ -166,17 +180,21 @@ class CartScreenTest {
         var removeProductId: String? = null
 
         createCartScreen(
-            state = cartSuccess(
-                cartItems = listOf(
-                    cartItemWithPromotion(
-                        product = bread(), quantity = 2
-                    )
-                )
-            ),
-            onRemove = { removeProductId = it }
+            state =
+                cartSuccess(
+                    cartItems =
+                        listOf(
+                            cartItemWithPromotion(
+                                product = bread(),
+                                quantity = 2,
+                            ),
+                        ),
+                ),
+            onRemove = { removeProductId = it },
         )
 
-        composeRule.onNodeWithTag(cartItem(bread().id))
+        composeRule
+            .onNodeWithTag(cartItem(bread().id))
             .performTouchInput { swipeRight() }
 
         composeRule.waitUntil(timeoutMillis = 5_000) {
@@ -188,14 +206,16 @@ class CartScreenTest {
 
     @Test
     fun givenItemsAtStockEdges_whenRendered_thenInvalidControlsAreDisable() {
-        val fullStockItem: CartItemWithPromotion = cartItemWithPromotion(
-            product = bread(stock = 7),
-            quantity = 7
-        )
+        val fullStockItem: CartItemWithPromotion =
+            cartItemWithPromotion(
+                product = bread(stock = 7),
+                quantity = 7,
+            )
 
         createCartScreen(state = cartSuccess(cartItems = listOf(fullStockItem)))
 
-        composeRule.onNodeWithTag(testTag = cartQuantityIncrease(productId = bread().id))
+        composeRule
+            .onNodeWithTag(testTag = cartQuantityIncrease(productId = bread().id))
             .assertIsNotEnabled()
     }
 }

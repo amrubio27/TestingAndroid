@@ -21,38 +21,43 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class CartViewModel @Inject constructor(
+class CartViewModel
+@Inject
+constructor(
     private val cartItemRepository: CartItemRepository,
     getCartSummaryUseCase: GetCartSummaryUseCase,
     private val updateCartItemUseCase: UpdateCartItemUseCase,
-    getCartItemsWithPromotionsUseCase: GetCartItemsWithPromotionsUseCase
+    getCartItemsWithPromotionsUseCase: GetCartItemsWithPromotionsUseCase,
 ) : ViewModel() {
-
     private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    val uiState: StateFlow<CartUiState> = combine(
-        refreshTrigger.onStart { emit(Unit) },
-        getCartItemsWithPromotionsUseCase(),
-        getCartSummaryUseCase()
-    ) { _, cartItemWithPromotion, summary ->
-        CartUiState.Success(
-            summary = summary, cartItems = cartItemWithPromotion, isLoading = false
-        ) as CartUiState
-    }.catch { e ->
-        _events.emit(CartEvent.ShowMessage(e.message.orEmpty()))
-        emit(CartUiState.Error(e.message.orEmpty()))
-
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = CartUiState.Loading
-    )
+    val uiState: StateFlow<CartUiState> =
+        combine(
+            refreshTrigger.onStart { emit(Unit) },
+            getCartItemsWithPromotionsUseCase(),
+            getCartSummaryUseCase(),
+        ) { _, cartItemWithPromotion, summary ->
+            CartUiState.Success(
+                summary = summary,
+                cartItems = cartItemWithPromotion,
+                isLoading = false,
+            ) as CartUiState
+        }.catch { e ->
+            _events.emit(CartEvent.ShowMessage(e.message.orEmpty()))
+            emit(CartUiState.Error(e.message.orEmpty()))
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = CartUiState.Loading,
+        )
 
     private val _events = MutableSharedFlow<CartEvent>(extraBufferCapacity = 1)
     val event: SharedFlow<CartEvent> = _events
 
-
-    fun updateCartItem(productId: String, quantity: Int) {
+    fun updateCartItem(
+        productId: String,
+        quantity: Int,
+    ) {
         viewModelScope.launch {
             try {
                 updateCartItemUseCase(productId, quantity)
@@ -72,11 +77,17 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    fun increaseQuantity(productId: String, currentQuantity: Int) {
+    fun increaseQuantity(
+        productId: String,
+        currentQuantity: Int,
+    ) {
         updateCartItem(productId, currentQuantity + 1)
     }
 
-    fun decreaseQuantity(productId: String, currentQuantity: Int) {
+    fun decreaseQuantity(
+        productId: String,
+        currentQuantity: Int,
+    ) {
         if (currentQuantity > 1) {
             updateCartItem(productId, currentQuantity - 1)
         } else {

@@ -34,31 +34,22 @@ private val Context.testingDataStore: DataStore<Preferences> by preferencesDataS
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [DataModule::class]
+    replaces = [DataModule::class],
 )
 object TestDataModule {
     @Provides
     @Singleton
-    fun provideDispatchersProvider(): DispatchersProvider {
-        return DefaultDispatchersProvider()
-    }
+    fun provideDispatchersProvider(): DispatchersProvider = DefaultDispatchersProvider()
 
     @Provides
     @Singleton
-    fun provideProductRepository(
-        productRepositoryImpl: ProductRepositoryImpl
-    ): ProductRepository {
-        return productRepositoryImpl
-    }
+    fun provideProductRepository(productRepositoryImpl: ProductRepositoryImpl): ProductRepository =
+        productRepositoryImpl
 
     @Provides
     @Singleton
-    fun providePromotionRepository(
-        promotionRepositoryImpl: PromotionRepositoryImpl
-    ): PromotionRepository {
-        return promotionRepositoryImpl
-    }
-
+    fun providePromotionRepository(promotionRepositoryImpl: PromotionRepositoryImpl): PromotionRepository =
+        promotionRepositoryImpl
 
     @Provides
     fun provideProductDao(database: MiniMarketDatabase): ProductDao = database.productDao()
@@ -73,37 +64,29 @@ object TestDataModule {
     @Singleton
     fun provideDatabase(): MiniMarketDatabase {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        return Room.inMemoryDatabaseBuilder(
-            context,
-            MiniMarketDatabase::class.java
-        ).build()
+        return Room
+            .inMemoryDatabaseBuilder(
+                context,
+                MiniMarketDatabase::class.java,
+            ).build()
     }
 
     @Provides
     @Singleton
-    fun provideDataStore(): DataStore<Preferences> {
-        return ApplicationProvider.getApplicationContext<Context>().testingDataStore
-    }
+    fun provideDataStore(): DataStore<Preferences> =
+        ApplicationProvider.getApplicationContext<Context>().testingDataStore
 
     @Provides
     @Singleton
-    fun provideSettingsRepository(
-        settingsRepositoryImpl: SettingsRepositoryImpl
-    ): SettingsRepository {
-        return settingsRepositoryImpl
-    }
+    fun provideSettingsRepository(settingsRepositoryImpl: SettingsRepositoryImpl): SettingsRepository =
+        settingsRepositoryImpl
 
     @Provides
     @Singleton
-    fun provideCartRepository(
-        cartItemRepositoryImpl: CartItemRepositoryImpl
-    ): CartItemRepository {
-        return cartItemRepositoryImpl
-    }
+    fun provideCartRepository(cartItemRepositoryImpl: CartItemRepositoryImpl): CartItemRepository =
+        cartItemRepositoryImpl
 
     @Provides
     @Singleton
-    fun provideClock(systemClock: SystemClock): Clock {
-        return systemClock
-    }
+    fun provideClock(systemClock: SystemClock): Clock = systemClock
 }

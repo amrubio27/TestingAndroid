@@ -17,7 +17,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ProductDetailViewModelTest {
-
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
@@ -26,37 +25,42 @@ class ProductDetailViewModelTest {
     private val fakePromotion = FakePromotionRepository()
     private val fakeClock: FakeSystemClock = FakeSystemClock()
 
-    private fun createViewModel() = ProductDetailViewModel(
-        getProductDetailWithPromotionUseCase = GetProductDetailWithPromotionUseCase(
-            fakeProduct,
-            fakePromotion,
-            GetPromotionForProduct(),
-            fakeClock
-        ),
-        addToCartUseCase = AddToCartUseCase(
-            fakeCart,
-            fakeProduct
+    private fun createViewModel() =
+        ProductDetailViewModel(
+            getProductDetailWithPromotionUseCase =
+                GetProductDetailWithPromotionUseCase(
+                    fakeProduct,
+                    fakePromotion,
+                    GetPromotionForProduct(),
+                    fakeClock,
+                ),
+            addToCartUseCase =
+                AddToCartUseCase(
+                    fakeCart,
+                    fakeProduct,
+                ),
         )
-    )
 
     @Test
     fun `GIVEN valid product id WHEN load product THEN emits item`() =
         runTest(mainDispatcherRule.scheduler) {
-            //Given
+            // Given
             val productId = "p1"
-            val p = product {
-                withId(productId); withName("miguel")
-            }
+            val p =
+                product {
+                    withId(productId)
+                    withName("miguel")
+                }
             fakeProduct.setProducts(listOf(p))
 
             val viewModel = createViewModel()
 
             viewModel.uiState.test {
                 awaitItem()
-                //when
+                // when
                 viewModel.loadProduct(productId)
 
-                //then
+                // then
                 val finalState = awaitItem()
 
                 assertEquals(productId, finalState.item?.product?.id)
@@ -68,7 +72,7 @@ class ProductDetailViewModelTest {
     @Test
     fun `GIVEN missing product id WHEN load product THEN ends with item null`() =
         runTest(mainDispatcherRule.scheduler) {
-            //Given
+            // Given
             fakeProduct.setProducts(emptyList())
             val viewModel = createViewModel()
 
@@ -86,7 +90,11 @@ class ProductDetailViewModelTest {
     @Test
     fun `GIVEN loaded product WHEN add to cart succeeds THEN emits succes event`() =
         runTest(mainDispatcherRule.scheduler) {
-            val p = product { withId("1"); withStock(10) }
+            val p =
+                product {
+                    withId("1")
+                    withStock(10)
+                }
             fakeProduct.setProducts(listOf(p))
             val viewModel = createViewModel()
 
@@ -103,7 +111,11 @@ class ProductDetailViewModelTest {
     @Test
     fun `GIVEN loaded product without stock WHEN add to cart THEN emits insufficient stock error`() =
         runTest(mainDispatcherRule.scheduler) {
-            val p = product { withId("1"); withStock(0) }
+            val p =
+                product {
+                    withId("1")
+                    withStock(0)
+                }
             fakeProduct.setProducts(listOf(p))
             val viewModel = createViewModel()
 
@@ -115,8 +127,5 @@ class ProductDetailViewModelTest {
                 assertEquals(ProductDetailEvent.INSUFFICIENT_STOCK_ERROR, result)
                 cancelAndIgnoreRemainingEvents()
             }
-
         }
-
-
 }

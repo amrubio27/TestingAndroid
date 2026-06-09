@@ -17,7 +17,6 @@ import org.junit.Test
 import java.time.Instant
 
 class GetCartSummaryUseCaseTest {
-
     private lateinit var clock: FakeSystemClock
     private lateinit var cartRepository: FakeCartItemRepository
     private lateinit var productRepository: FakeProductRepository
@@ -31,80 +30,119 @@ class GetCartSummaryUseCaseTest {
         promoRepository = FakePromotionRepository()
     }
 
-    private fun useCase() = GetCartSummaryUseCase(
-        cartRepository,
-        productRepository,
-        promoRepository,
-        GetPromotionForProduct(),
-        clock
-    )
+    private fun useCase() =
+        GetCartSummaryUseCase(
+            cartRepository,
+            productRepository,
+            promoRepository,
+            GetPromotionForProduct(),
+            clock,
+        )
 
     @Test
-    fun `given percent promotion when invoke then calculate correctly`() = runTest {
-        val productId = "p1"
-        val product = product {
-            withId(productId);
-            withPrice(100.0)
+    fun `given percent promotion when invoke then calculate correctly`() =
+        runTest {
+            val productId = "p1"
+            val product =
+                product {
+                    withId(productId)
+                    withPrice(100.0)
+                }
+            val promo =
+                promotion {
+                    withProductIds(listOf(productId))
+                    withType(PromotionType.PERCENT)
+                    withValue(10.0)
+                    withStartTime(clock.now().minusSeconds(10))
+                    withEndTime(clock.now().plusSeconds(10))
+                }
+            val cartItem =
+                cartItem {
+                    withProductId(productId)
+                    withQuantity(2)
+                }
+
+            productRepository.setProducts(listOf(product))
+            promoRepository.setPromotions(listOf(promo))
+            cartRepository.setCartItems(listOf(cartItem))
+
+            val summary = (useCase()()).first() // O tambien useCase().invoke().first()
+
+            assertEquals(180.0, summary.finalTotal, 0.001)
+            assertEquals(20.0, summary.discountTotal, 0.001)
+            assertEquals(200.0, summary.subtotal, 0.001)
         }
-        val promo = promotion {
-            withProductIds(listOf(productId))
-            withType(PromotionType.PERCENT)
-            withValue(10.0)
-            withStartTime(clock.now().minusSeconds(10))
-            withEndTime(clock.now().plusSeconds(10))
-        }
-        val cartItem = cartItem { withProductId(productId); withQuantity(2) }
-
-        productRepository.setProducts(listOf(product))
-        promoRepository.setPromotions(listOf(promo))
-        cartRepository.setCartItems(listOf(cartItem))
-
-        val summary = (useCase()()).first() //O tambien useCase().invoke().first()
-
-        assertEquals(180.0, summary.finalTotal, 0.001)
-        assertEquals(20.0, summary.discountTotal, 0.001)
-        assertEquals(200.0, summary.subtotal, 0.001)
-    }
 
     @Test
-    fun `given 3 items in 2x1 promotion when invoke then only discounts 1 unit`() = runTest {
-        val productId = "p1"
-        val product = product { withId(productId); withPrice(100.0) }
-        val promo = promotion {
-            withProductIds(listOf(productId))
-            withType(PromotionType.BUY_X_PAY_Y)
-            withBuyQuantity(2); withValue(1.0)
-            withStartTime(clock.now().minusSeconds(10)); withEndTime(clock.now().plusSeconds(10))
+    fun `given 3 items in 2x1 promotion when invoke then only discounts 1 unit`() =
+        runTest {
+            val productId = "p1"
+            val product =
+                product {
+                    withId(productId)
+                    withPrice(100.0)
+                }
+            val promo =
+                promotion {
+                    withProductIds(listOf(productId))
+                    withType(PromotionType.BUY_X_PAY_Y)
+                    withBuyQuantity(2)
+                    withValue(1.0)
+                    withStartTime(clock.now().minusSeconds(10))
+                    withEndTime(clock.now().plusSeconds(10))
+                }
+            val cartItem =
+                cartItem {
+                    withProductId(productId)
+                    withQuantity(3)
+                }
+
+            productRepository.setProducts(listOf(product))
+            promoRepository.setPromotions(listOf(promo))
+            cartRepository.setCartItems(listOf(cartItem))
+
+            val summary = (useCase()()).first()
+
+            assertEquals(300.0, summary.subtotal, 0.001)
+            assertEquals(200.0, summary.finalTotal, 0.001)
+            assertEquals(100.0, summary.discountTotal, 0.001)
         }
-        val cartItem = cartItem { withProductId(productId); withQuantity(3) }
-
-        productRepository.setProducts(listOf(product))
-        promoRepository.setPromotions(listOf(promo))
-        cartRepository.setCartItems(listOf(cartItem))
-
-        val summary = (useCase()()).first()
-
-        assertEquals(300.0, summary.subtotal, 0.001)
-        assertEquals(200.0, summary.finalTotal, 0.001)
-        assertEquals(100.0, summary.discountTotal, 0.001)
-    }
 
     @Test
     fun `given multiple products with different promotions when invoke them sums all correctly`() =
         runTest {
             val now = clock.now()
-            val p1 = product { withId("p1"); withPrice(100.0) } // Con promo
-            val p2 = product { withId("p2"); withPrice(50.0) } // SIN promo
+            val p1 =
+                product {
+                    withId("p1")
+                    withPrice(100.0)
+                } // Con promo
+            val p2 =
+                product {
+                    withId("p2")
+                    withPrice(50.0)
+                } // SIN promo
 
-            val promoPercent = promotion {
-                withProductIds(listOf("p1")); withType(PromotionType.PERCENT); withValue(10.0)
-                withStartTime(now.minusSeconds(10)); withEndTime(now.plusSeconds(10))
-            }
+            val promoPercent =
+                promotion {
+                    withProductIds(listOf("p1"))
+                    withType(PromotionType.PERCENT)
+                    withValue(10.0)
+                    withStartTime(now.minusSeconds(10))
+                    withEndTime(now.plusSeconds(10))
+                }
 
-            val cart = listOf(
-                cartItem { withProductId("p1"); withQuantity(1) },
-                cartItem { withProductId("p2"); withQuantity(1) }
-            )
+            val cart =
+                listOf(
+                    cartItem {
+                        withProductId("p1")
+                        withQuantity(1)
+                    },
+                    cartItem {
+                        withProductId("p2")
+                        withQuantity(1)
+                    },
+                )
 
             productRepository.setProducts(listOf(p1, p2))
             promoRepository.setPromotions(listOf(promoPercent))
@@ -118,46 +156,77 @@ class GetCartSummaryUseCaseTest {
         }
 
     @Test
-    fun `given expired promotion when invoke then discount is zero`() = runTest {
-        val now = clock.now()
-        val p1 = product { withId("p1"); withPrice(100.0) }
+    fun `given expired promotion when invoke then discount is zero`() =
+        runTest {
+            val now = clock.now()
+            val p1 =
+                product {
+                    withId("p1")
+                    withPrice(100.0)
+                }
 
-        val promoPercent = promotion {
-            withProductIds(listOf("p1")); withType(PromotionType.PERCENT); withValue(10.0)
-            withStartTime(now.minusSeconds(10)); withEndTime(now.minusSeconds(5))
+            val promoPercent =
+                promotion {
+                    withProductIds(listOf("p1"))
+                    withType(PromotionType.PERCENT)
+                    withValue(10.0)
+                    withStartTime(now.minusSeconds(10))
+                    withEndTime(now.minusSeconds(5))
+                }
+
+            productRepository.setProducts(listOf(p1))
+            promoRepository.setPromotions(listOf(promoPercent))
+            cartRepository.setCartItems(
+                listOf(
+                    cartItem {
+                        withProductId("p1")
+                        withQuantity(1)
+                    },
+                ),
+            )
+
+            val summary = useCase()().first()
+
+            assertEquals(0.0, summary.discountTotal, 0.001)
+            assertEquals(100.0, summary.finalTotal, 0.001)
         }
-
-        productRepository.setProducts(listOf(p1))
-        promoRepository.setPromotions(listOf(promoPercent))
-        cartRepository.setCartItems(listOf(cartItem { withProductId("p1"); withQuantity(1) }))
-
-        val summary = useCase()().first()
-
-        assertEquals(0.0, summary.discountTotal, 0.001)
-        assertEquals(100.0, summary.finalTotal, 0.001)
-    }
 
     @Test
-    fun `given active promotion when time advances then summary update automatically`() = runTest {
-        val now = clock.now()
-        val p1 = product { withId("p1"); withPrice(100.0) }
+    fun `given active promotion when time advances then summary update automatically`() =
+        runTest {
+            val now = clock.now()
+            val p1 =
+                product {
+                    withId("p1")
+                    withPrice(100.0)
+                }
 
-        val promoPercent = promotion {
-            withProductIds(listOf("p1")); withType(PromotionType.PERCENT); withValue(10.0)
-            withStartTime(now.minusSeconds(10)); withEndTime(now.plusSeconds(5))
+            val promoPercent =
+                promotion {
+                    withProductIds(listOf("p1"))
+                    withType(PromotionType.PERCENT)
+                    withValue(10.0)
+                    withStartTime(now.minusSeconds(10))
+                    withEndTime(now.plusSeconds(5))
+                }
+
+            productRepository.setProducts(listOf(p1))
+            promoRepository.setPromotions(listOf(promoPercent))
+            cartRepository.setCartItems(
+                listOf(
+                    cartItem {
+                        withProductId("p1")
+                        withQuantity(1)
+                    },
+                ),
+            )
+
+            val summaryFlow = useCase()()
+
+            assertEquals(10.0, summaryFlow.first().discountTotal, 0.001)
+
+            clock.advanceTimeBy(6)
+
+            assertEquals(0.0, summaryFlow.first().discountTotal, 0.001)
         }
-
-        productRepository.setProducts(listOf(p1))
-        promoRepository.setPromotions(listOf(promoPercent))
-        cartRepository.setCartItems(listOf(cartItem { withProductId("p1"); withQuantity(1) }))
-
-        val summaryFlow = useCase()()
-
-        assertEquals(10.0, summaryFlow.first().discountTotal, 0.001)
-
-        clock.advanceTimeBy(6)
-
-        assertEquals(0.0, summaryFlow.first().discountTotal, 0.001)
-    }
-
 }

@@ -24,11 +24,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductDetailViewModel @Inject constructor(
+class ProductDetailViewModel
+@Inject
+constructor(
     val getProductDetailWithPromotionUseCase: GetProductDetailWithPromotionUseCase,
-    val addToCartUseCase: AddToCartUseCase
+    val addToCartUseCase: AddToCartUseCase,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow<ProductDetailUiState>(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
 
@@ -40,20 +41,25 @@ class ProductDetailViewModel @Inject constructor(
     fun loadProduct(productId: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         productJob?.cancel()
-        productJob = getProductDetailWithPromotionUseCase(productId).onEach { product ->
-            _uiState.value = _uiState.value.copy(isLoading = false, item = product)
-        }.catch { e: Throwable ->
-            _uiState.value = _uiState.value.copy(isLoading = false)
-            if (e is AppError) {
-                handleError(e)
-            } else {
-                handleError(AppError.UnknownError(e.message))
-            }
-        }.launchIn(viewModelScope)
+        productJob =
+            getProductDetailWithPromotionUseCase(productId)
+                .onEach { product ->
+                    _uiState.value = _uiState.value.copy(isLoading = false, item = product)
+                }.catch { e: Throwable ->
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    if (e is AppError) {
+                        handleError(e)
+                    } else {
+                        handleError(AppError.UnknownError(e.message))
+                    }
+                }.launchIn(viewModelScope)
     }
 
     fun addToCart() {
-        val product = _uiState.value.item?.product?.id ?: return
+        val product =
+            _uiState.value.item
+                ?.product
+                ?.id ?: return
         viewModelScope.launch {
             try {
                 addToCartUseCase(product)
@@ -67,12 +73,12 @@ class ProductDetailViewModel @Inject constructor(
     }
 
     private suspend fun handleError(e: AppError) {
-        val newEvent = when (e) {
-            NetworkError -> ProductDetailEvent.NETWORK_ERROR
-            is Validation.InsufficientStock -> ProductDetailEvent.INSUFFICIENT_STOCK_ERROR
-            is UnknownError, DataBaseError, NotFoundError, Validation.QuantityMustBePositive -> ProductDetailEvent.UNKNOWN_ERROR
-        }
+        val newEvent =
+            when (e) {
+                NetworkError -> ProductDetailEvent.NETWORK_ERROR
+                is Validation.InsufficientStock -> ProductDetailEvent.INSUFFICIENT_STOCK_ERROR
+                is UnknownError, DataBaseError, NotFoundError, Validation.QuantityMustBePositive -> ProductDetailEvent.UNKNOWN_ERROR
+            }
         _events.emit(newEvent)
     }
-
 }

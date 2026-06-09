@@ -22,9 +22,7 @@ import org.junit.Rule
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-
 class SettingsScreenTest {
-
     @get:Rule
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
@@ -32,14 +30,14 @@ class SettingsScreenTest {
         uiState: SettingsUiState = SettingsUiState(),
         onBack: () -> Unit = {},
         onInStockOnlyChange: (Boolean) -> Unit = {},
-        onThemeModeSelected: (ThemeMode) -> Unit = {}
+        onThemeModeSelected: (ThemeMode) -> Unit = {},
     ) {
         composeRule.setContent {
             SettingsContent(
                 uiState = uiState,
                 onBack = onBack,
                 onInStockOnlyChange = onInStockOnlyChange,
-                onThemeModeSelected = onThemeModeSelected
+                onThemeModeSelected = onThemeModeSelected,
             )
         }
     }
@@ -59,7 +57,8 @@ class SettingsScreenTest {
         composeRule.onNodeWithText(getString(R.string.settings_title)).assertIsDisplayed()
         composeRule.onNodeWithText(getString(R.string.settings_in_stock_only)).assertIsDisplayed()
         composeRule.onNodeWithText(getString(R.string.settings_filters_section)).assertIsDisplayed()
-        composeRule.onNodeWithText(getString(R.string.settings_appearance_section))
+        composeRule
+            .onNodeWithText(getString(R.string.settings_appearance_section))
             .assertIsDisplayed()
         composeRule.onNodeWithText(getString(R.string.settings_theme_label)).assertIsDisplayed()
 
@@ -85,21 +84,24 @@ class SettingsScreenTest {
     @Test
     fun givenLightTheme_whenRendered_thenLightOptionIsSelected() {
         createSettingsScreen(uiState = SettingsUiState(themeMode = ThemeMode.LIGHT))
-        composeRule.onNodeWithTag(testTag = UiTestTag.settingsThemeOption("light"))
+        composeRule
+            .onNodeWithTag(testTag = UiTestTag.settingsThemeOption("light"))
             .assertIsSelected()
     }
 
     @Test
     fun givenSystemTheme_whenRendered_thenSystemOptionIsSelected() {
         createSettingsScreen(uiState = SettingsUiState(themeMode = ThemeMode.SYSTEM))
-        composeRule.onNodeWithTag(testTag = UiTestTag.settingsThemeOption("System"))
+        composeRule
+            .onNodeWithTag(testTag = UiTestTag.settingsThemeOption("System"))
             .assertIsSelected()
     }
 
     @Test
     fun givenDarkTheme_whenRendered_thenDarkOptionIsSelected() {
         createSettingsScreen(uiState = SettingsUiState(themeMode = ThemeMode.DARK))
-        composeRule.onNodeWithTag(testTag = UiTestTag.settingsThemeOption("Dark"))
+        composeRule
+            .onNodeWithTag(testTag = UiTestTag.settingsThemeOption("Dark"))
             .assertIsSelected()
     }
 
@@ -108,7 +110,7 @@ class SettingsScreenTest {
         var backClicked = false
 
         createSettingsScreen(
-            onBack = { backClicked = true }
+            onBack = { backClicked = true },
         )
 
         composeRule.onNodeWithTag(testTag = TOP_APP_BAR).performClick()
@@ -121,7 +123,7 @@ class SettingsScreenTest {
 
         createSettingsScreen(
             uiState = SettingsUiState(inStockOnly = false),
-            onInStockOnlyChange = { newState -> emitted = newState }
+            onInStockOnlyChange = { newState -> emitted = newState },
         )
 
         composeRule.onNodeWithTag(SETTINGS_IN_STOCK_SWITCH).performClick()
@@ -135,12 +137,11 @@ class SettingsScreenTest {
 
         createSettingsScreen(
             uiState = SettingsUiState(themeMode = ThemeMode.LIGHT),
-            onThemeModeSelected = { newThemeMode -> selectedTheme = newThemeMode }
+            onThemeModeSelected = { newThemeMode -> selectedTheme = newThemeMode },
         )
 
         composeRule.onNodeWithTag(testTag = settingsThemeOption("dark")).performClick()
 
         assertEquals(expected = ThemeMode.DARK, actual = selectedTheme)
     }
-
 }

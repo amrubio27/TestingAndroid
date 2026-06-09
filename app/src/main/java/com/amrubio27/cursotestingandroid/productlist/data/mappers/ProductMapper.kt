@@ -14,7 +14,7 @@ fun ProductResponse.toEntity(): ProductEntity {
         price = finalPrice,
         category = category,
         stock = stock,
-        imageUrl = imageUrl
+        imageUrl = imageUrl,
     )
 }
 
@@ -28,6 +28,6 @@ fun ProductEntity.toDomain(): Product? {
         price = price,
         category = category,
         stock = stock ?: 0,
-        imageUrl = imageUrl
+        imageUrl = imageUrl,
     )
 }

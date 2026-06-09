@@ -14,13 +14,11 @@ class FakeSettingsRepository : SettingsRepository {
     private val _sortOption = MutableStateFlow(SortOption.NONE)
     private val _filtersVisible = MutableStateFlow(true)
 
-
     override val inStockOnly: Flow<Boolean> = _inStockOnly.asStateFlow()
     override val themeMode: Flow<ThemeMode> = _themeMode.asStateFlow()
     override val selectedCategory: Flow<String?> = _selectedCategory.asStateFlow()
     override val sortOption: Flow<SortOption> = _sortOption.asStateFlow()
     override val filtersVisible: Flow<Boolean> = _filtersVisible.asStateFlow()
-
 
     override suspend fun setInStockOnly(value: Boolean) {
         _inStockOnly.value = value

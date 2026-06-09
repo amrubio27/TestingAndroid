@@ -18,7 +18,12 @@ sealed class AppError : Exception() {
             private fun readResolve(): Any = QuantityMustBePositive
         }
 
-        data class InsufficientStock(val available: Int) : Validation()
+        data class InsufficientStock(
+            val available: Int,
+        ) : Validation()
     }
-    data class UnknownError(override val message: String?) : AppError()
+
+    data class UnknownError(
+        override val message: String?,
+    ) : AppError()
 }

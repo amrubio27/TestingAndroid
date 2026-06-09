@@ -28,7 +28,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
 
 @Module
@@ -36,26 +35,17 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("s
 object DataModule {
     @Provides
     @Singleton
-    fun provideDispatchersProvider(): DispatchersProvider {
-        return DefaultDispatchersProvider()
-    }
+    fun provideDispatchersProvider(): DispatchersProvider = DefaultDispatchersProvider()
 
     @Provides
     @Singleton
-    fun provideProductRepository(
-        productRepositoryImpl: ProductRepositoryImpl
-    ): ProductRepository {
-        return productRepositoryImpl
-    }
+    fun provideProductRepository(productRepositoryImpl: ProductRepositoryImpl): ProductRepository =
+        productRepositoryImpl
 
     @Provides
     @Singleton
-    fun providePromotionRepository(
-        promotionRepositoryImpl: PromotionRepositoryImpl
-    ): PromotionRepository {
-        return promotionRepositoryImpl
-    }
-
+    fun providePromotionRepository(promotionRepositoryImpl: PromotionRepositoryImpl): PromotionRepository =
+        promotionRepositoryImpl
 
     @Provides
     fun provideProductDao(database: MiniMarketDatabase): ProductDao = database.productDao()
@@ -68,40 +58,33 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): MiniMarketDatabase {
-        return Room.databaseBuilder(
-            context,
-            MiniMarketDatabase::class.java,
-            "market_db"
-        ).build()
-    }
+    fun provideDatabase(
+        @ApplicationContext context: Context,
+    ): MiniMarketDatabase =
+        Room
+            .databaseBuilder(
+                context,
+                MiniMarketDatabase::class.java,
+                "market_db",
+            ).build()
 
     @Provides
     @Singleton
-    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return context.dataStore
-    }
+    fun provideDataStore(
+        @ApplicationContext context: Context,
+    ): DataStore<Preferences> = context.dataStore
 
     @Provides
     @Singleton
-    fun provideSettingsRepository(
-        settingsRepositoryImpl: SettingsRepositoryImpl
-    ): SettingsRepository {
-        return settingsRepositoryImpl
-    }
+    fun provideSettingsRepository(settingsRepositoryImpl: SettingsRepositoryImpl): SettingsRepository =
+        settingsRepositoryImpl
 
     @Provides
     @Singleton
-    fun provideCartRepository(
-        cartItemRepositoryImpl: CartItemRepositoryImpl
-    ): CartItemRepository {
-        return cartItemRepositoryImpl
-    }
+    fun provideCartRepository(cartItemRepositoryImpl: CartItemRepositoryImpl): CartItemRepository =
+        cartItemRepositoryImpl
 
     @Provides
     @Singleton
-    fun provideClock(systemClock: SystemClock): Clock {
-        return systemClock
-    }
-
+    fun provideClock(systemClock: SystemClock): Clock = systemClock
 }

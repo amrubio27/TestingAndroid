@@ -23,27 +23,29 @@ import org.junit.Rule
 import kotlin.test.Test
 
 class ProductDetailScreenTest {
-
     @get:Rule
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     private fun createProductDetailScreen(
         uiState: ProductDetailUiState = ProductDetailUiStateMother.success(),
         onBack: () -> Unit = {},
-        onAddToCart: () -> Unit = {}
+        onAddToCart: () -> Unit = {},
     ) {
         composeRule.setContent {
             ProductDetailContent(
                 uiState = uiState,
                 onBack = onBack,
-                onAddToCart = onAddToCart
+                onAddToCart = onAddToCart,
             )
         }
     }
 
     private fun getString(resId: Int): String = composeRule.activity.getString(resId)
-    private fun getString(resId: Int, vararg formatArgs: Any): String =
-        composeRule.activity.getString(resId, *formatArgs)
+
+    private fun getString(
+        resId: Int,
+        vararg formatArgs: Any,
+    ): String = composeRule.activity.getString(resId, *formatArgs)
 
     @Test
     fun givenLoadingState_whenRendered_thenShowsProgressView() {
@@ -56,10 +58,11 @@ class ProductDetailScreenTest {
     fun givenSuccessStateNoPromotion_whenRendered_thenShowsProductDetailsAndAddToCartButtonEnabled() {
         val product = coffee(stock = 5)
         createProductDetailScreen(
-            uiState = ProductDetailUiStateMother.success(
-                product = product,
-                promotion = null
-            )
+            uiState =
+                ProductDetailUiStateMother.success(
+                    product = product,
+                    promotion = null,
+                ),
         )
 
         composeRule.onAllNodesWithText(product.name).onFirst().assertIsDisplayed()
@@ -76,10 +79,11 @@ class ProductDetailScreenTest {
         val product = coffee()
         val promo = percent(percent = 20.0, discountedPrice = 3.60)
         createProductDetailScreen(
-            uiState = ProductDetailUiStateMother.success(
-                product = product,
-                promotion = promo
-            )
+            uiState =
+                ProductDetailUiStateMother.success(
+                    product = product,
+                    promotion = promo,
+                ),
         )
 
         // Precio original
@@ -95,10 +99,11 @@ class ProductDetailScreenTest {
         val product = coffee()
         val promo = buyXPayY(buy = 3, pay = 2, label = "3x2")
         createProductDetailScreen(
-            uiState = ProductDetailUiStateMother.success(
-                product = product,
-                promotion = promo
-            )
+            uiState =
+                ProductDetailUiStateMother.success(
+                    product = product,
+                    promotion = promo,
+                ),
         )
 
         // Precio original
@@ -111,10 +116,11 @@ class ProductDetailScreenTest {
     fun givenSuccessStateNoStock_whenRendered_thenShowsNoStockAndAddToCartButtonDisabled() {
         val product = coffee(stock = 0)
         createProductDetailScreen(
-            uiState = ProductDetailUiStateMother.success(
-                product = product,
-                promotion = null
-            )
+            uiState =
+                ProductDetailUiStateMother.success(
+                    product = product,
+                    promotion = null,
+                ),
         )
 
         composeRule.onNodeWithText(getString(R.string.detail_no_stock)).assertIsDisplayed()
@@ -126,7 +132,7 @@ class ProductDetailScreenTest {
         var backClicked = false
         createProductDetailScreen(
             uiState = ProductDetailUiStateMother.success(),
-            onBack = { backClicked = true }
+            onBack = { backClicked = true },
         )
 
         composeRule.onNodeWithTag(testTag = TOP_APP_BAR).performClick()
@@ -139,7 +145,7 @@ class ProductDetailScreenTest {
         var addToCartClicked = false
         createProductDetailScreen(
             uiState = ProductDetailUiStateMother.success(),
-            onAddToCart = { addToCartClicked = true }
+            onAddToCart = { addToCartClicked = true },
         )
 
         composeRule.onNodeWithTag(testTag = PRODUCT_DETAIL_ADD_TO_CART).performClick()

@@ -16,19 +16,17 @@ class FakeProductRepository : ProductRepository {
 
     override fun getProducts(): Flow<List<Product>> = _products.asStateFlow()
 
-    override fun getProductById(id: String): Flow<Product?> {
-        return _products.asStateFlow().map { products ->
+    override fun getProductById(id: String): Flow<Product?> =
+        _products.asStateFlow().map { products ->
             products.find { it.id == id }
         }
-    }
 
     override suspend fun refreshProducts() {
-        //No effect
+        // No effect
     }
 
-    override fun getProductsByIds(ids: Set<String>): Flow<List<Product>> {
-        return _products.asStateFlow().map { products ->
+    override fun getProductsByIds(ids: Set<String>): Flow<List<Product>> =
+        _products.asStateFlow().map { products ->
             products.filter { it.id in ids }
         }
-    }
 }

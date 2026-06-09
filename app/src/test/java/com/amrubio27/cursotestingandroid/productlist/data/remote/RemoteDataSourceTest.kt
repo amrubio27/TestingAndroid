@@ -1,6 +1,5 @@
 package com.amrubio27.cursotestingandroid.productlist.data.remote
 
-
 import com.amrubio27.cursotestingandroid.core.domain.model.AppError
 import com.amrubio27.cursotestingandroid.productlist.data.remote.response.ProductResponse
 import com.amrubio27.cursotestingandroid.productlist.data.remote.response.ProductsResponse
@@ -28,18 +27,21 @@ class RemoteDataSourceTest {
     @Before
     fun setUp() {
         server.start()
-        //como en el NetworkModule
-        json = Json {
-            ignoreUnknownKeys = true
-            isLenient = true
-            coerceInputValues = true
-        }
+        // como en el NetworkModule
+        json =
+            Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                coerceInputValues = true
+            }
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(server.url("/"))
-            .client(OkHttpClient())
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .build()
+        val retrofit =
+            Retrofit
+                .Builder()
+                .baseUrl(server.url("/"))
+                .client(OkHttpClient())
+                .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+                .build()
 
         val api = retrofit.create(MiniMarketApiService::class.java)
         remoteDataSource = RemoteDataSource(api)
@@ -51,98 +53,105 @@ class RemoteDataSourceTest {
     }
 
     @Test
-    fun `given empty json response when getProducts then returns empty list`() = runTest {
-        server.enqueue(
-            MockResponse()
-                .setBody("""{"products":[]}""")
-                .setResponseCode(200)
-        )
+    fun `given empty json response when getProducts then returns empty list`() =
+        runTest {
+            server.enqueue(
+                MockResponse()
+                    .setBody("""{"products":[]}""")
+                    .setResponseCode(200),
+            )
 
-        val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
+            val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
 
-        assertTrue(result.isSuccess)
-        assertTrue(result.getOrThrow().isEmpty())
-    }
-
-    @Test
-    fun `given valid json file when getProducts then returns mapped dtos`() = runTest {
-        val jsonResource: String =
-            ClassLoader.getSystemResource("products_success.json").readText()
-        server.enqueue(
-            MockResponse()
-                .setBody(jsonResource)
-                .setResponseCode(200)
-        )
-
-        val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
-
-        assertTrue(result.isSuccess)
-        assertEquals(40, result.getOrThrow().size)
-    }
+            assertTrue(result.isSuccess)
+            assertTrue(result.getOrThrow().isEmpty())
+        }
 
     @Test
-    fun `given serialized products when getProducts then data matches original object`() = runTest {
-        val productResponse = ProductResponse(
-            id = "id1",
-            name = "pan",
-            priceCents = 100,
-            category = "bread",
-            stock = 5
-        )
+    fun `given valid json file when getProducts then returns mapped dtos`() =
+        runTest {
+            val jsonResource: String =
+                ClassLoader.getSystemResource("products_success.json").readText()
+            server.enqueue(
+                MockResponse()
+                    .setBody(jsonResource)
+                    .setResponseCode(200),
+            )
 
-        val jsonString: String =
-            json.encodeToString(value = ProductsResponse(listOf(productResponse)))
-        server.enqueue(
-            MockResponse()
-                .setBody(jsonString)
-                .setResponseCode(200)
-        )
+            val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
 
-        val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
-
-        assertTrue(result.isSuccess)
-        assertTrue(result.getOrThrow().first().id == "id1")
-    }
+            assertTrue(result.isSuccess)
+            assertEquals(40, result.getOrThrow().size)
+        }
 
     @Test
-    fun `given 404 response when getProducts then returns NotFoundError`() = runTest {
-        server.enqueue(
-            MockResponse()
-                .setResponseCode(404)
-        )
+    fun `given serialized products when getProducts then data matches original object`() =
+        runTest {
+            val productResponse =
+                ProductResponse(
+                    id = "id1",
+                    name = "pan",
+                    priceCents = 100,
+                    category = "bread",
+                    stock = 5,
+                )
 
-        val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
+            val jsonString: String =
+                json.encodeToString(value = ProductsResponse(listOf(productResponse)))
+            server.enqueue(
+                MockResponse()
+                    .setBody(jsonString)
+                    .setResponseCode(200),
+            )
 
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is AppError.NotFoundError)
-    }
+            val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
+
+            assertTrue(result.isSuccess)
+            assertTrue(result.getOrThrow().first().id == "id1")
+        }
 
     @Test
-    fun `given malformed json when getProducts then returns UnknownError`() = runTest {
-        server.enqueue(
-            MockResponse()
-                .setBody("errordawdwad")
-                .setResponseCode(200)
-        )
+    fun `given 404 response when getProducts then returns NotFoundError`() =
+        runTest {
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(404),
+            )
 
-        val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
+            val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
 
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is AppError.UnknownError)
-    }
+            assertTrue(result.isFailure)
+            assertTrue(result.exceptionOrNull() is AppError.NotFoundError)
+        }
 
     @Test
-    fun `given promotions request when getPromotions then calls correct endpoint`() = runTest {
-        server.enqueue(
-            MockResponse()
-                .setBody("""{"promotions":[]}""")
-                .setResponseCode(200)
-        )
+    fun `given malformed json when getProducts then returns UnknownError`() =
+        runTest {
+            server.enqueue(
+                MockResponse()
+                    .setBody("errordawdwad")
+                    .setResponseCode(200),
+            )
 
-        remoteDataSource.getPromotions()
-        val result: RecordedRequest = server.takeRequest()
+            val result: Result<List<ProductResponse>> = remoteDataSource.getProducts()
 
-        assertEquals("/data/promotions.json", result.path)
-        assertEquals("GET", result.method)
-    }
+            assertTrue(result.isFailure)
+            assertTrue(result.exceptionOrNull() is AppError.UnknownError)
+        }
+
+    @Test
+    fun `given promotions request when getPromotions then calls correct endpoint`() =
+        runTest {
+            server.enqueue(
+                MockResponse()
+                    .setBody("""{"promotions":[]}""")
+                    .setResponseCode(200),
+            )
+
+            remoteDataSource.getPromotions()
+            val result: RecordedRequest = server.takeRequest()
+
+            assertEquals("/data/promotions.json", result.path)
+            assertEquals("GET", result.method)
+        }
 }

@@ -39,76 +39,82 @@ import java.util.Locale
 fun ProductItem(
     item: ProductWithPromotion,
     onClick: (ProductWithPromotion) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val product = item.product
     val promotion = item.promotion
-    val promoBadge = when (promotion) {
-        is ProductPromotion.BuyXPayY -> promotion.label
-        is ProductPromotion.Percent -> "-${promotion.percent.toInt()}%"
-        null -> null
-    }
+    val promoBadge =
+        when (promotion) {
+            is ProductPromotion.BuyXPayY -> promotion.label
+            is ProductPromotion.Percent -> "-${promotion.percent.toInt()}%"
+            null -> null
+        }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag(productListItem(product.id))
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-            .clickable { onClick(item) },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .testTag(productListItem(product.id))
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                .clickable { onClick(item) },
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-
             Box(
-                modifier = Modifier
-                    .size(88.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(88.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center,
             ) {
                 if (!product.imageUrl.isNullOrBlank()) {
                     AsyncImage(
                         model = product.imageUrl,
                         contentDescription = product.name,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.matchParentSize()
+                        modifier = Modifier.matchParentSize(),
                     )
                 } else {
                     Icon(
                         imageVector = Icons.Outlined.Image,
                         contentDescription = product.name,
-                        modifier = Modifier.size(33.dp)
+                        modifier = Modifier.size(33.dp),
                     )
                 }
 
                 if (promoBadge != null) {
                     Box(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(6.dp)
-                            .background(
-                                MaterialTheme.colorScheme.error, shape = RoundedCornerShape(4.dp)
-                            )
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                        modifier =
+                            Modifier
+                                .align(Alignment.TopStart)
+                                .padding(6.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.error,
+                                    shape = RoundedCornerShape(4.dp),
+                                )
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
                     ) {
                         Text(
                             promoBadge,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onError,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
             }
 
             Column(
-                modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     text = product.name,
@@ -116,7 +122,7 @@ fun ProductItem(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 if (product.description.isNotBlank()) {
@@ -125,52 +131,51 @@ fun ProductItem(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-
                     if (promotion is ProductPromotion.Percent) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 Text(
                                     stringResource(R.string.product_list_price_before),
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 Text(
                                     String.format(Locale.getDefault(), "%.2f", product.price),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textDecoration = TextDecoration.LineThrough
+                                    textDecoration = TextDecoration.LineThrough,
                                 )
                             }
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 Text(
                                     stringResource(R.string.product_list_price_now),
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.primary,
                                 )
                                 Text(
                                     String.format(
                                         Locale.getDefault(),
                                         "%.2f",
-                                        promotion.discountedPrice
+                                        promotion.discountedPrice,
                                     ),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
                                 )
                             }
                         }
@@ -179,12 +184,10 @@ fun ProductItem(
                             text = String.format(Locale.getDefault(), "%.2f", product.price),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
-
-
             }
         }
     }

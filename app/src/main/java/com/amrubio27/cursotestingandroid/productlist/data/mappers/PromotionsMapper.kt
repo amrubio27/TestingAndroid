@@ -13,10 +13,11 @@ fun PromotionResponse.toEntity(json: Json): PromotionEntity? {
     if (startAtEpoch == null || endAtEpoch == null) return null
 
     val productIds = listOf(productId)
-    val productIdsJson = json.encodeToString(
-        ListSerializer(String.serializer()),
-        productIds
-    )
+    val productIdsJson =
+        json.encodeToString(
+            ListSerializer(String.serializer()),
+            productIds,
+        )
 
     return PromotionEntity(
         id = id,
@@ -26,32 +27,33 @@ fun PromotionResponse.toEntity(json: Json): PromotionEntity? {
         buyX = buyX,
         payY = payY,
         startAtEpoch = startAtEpoch,
-        endAtEpoch = endAtEpoch
+        endAtEpoch = endAtEpoch,
     )
 }
 
 fun PromotionEntity.toDomain(json: Json): Promotion? {
-    val decodedProductIds = runCatching {
-        json.decodeFromString(
-            ListSerializer(String.serializer()),
-            productIds
-        )
-    }.getOrNull()
+    val decodedProductIds =
+        runCatching {
+            json.decodeFromString(
+                ListSerializer(String.serializer()),
+                productIds,
+            )
+        }.getOrNull()
 
-    val finalType = runCatching {
-        PromotionType.valueOf(type.trim().uppercase())
-    }.getOrNull()
+    val finalType =
+        runCatching {
+            PromotionType.valueOf(type.trim().uppercase())
+        }.getOrNull()
 
     if (finalType == null || decodedProductIds == null) return null
 
-    val finalOfferValue = when (finalType) {
-        PromotionType.PERCENT -> percent
-        PromotionType.BUY_X_PAY_Y -> payY
-    }?.toDouble()
+    val finalOfferValue =
+        when (finalType) {
+            PromotionType.PERCENT -> percent
+            PromotionType.BUY_X_PAY_Y -> payY
+        }?.toDouble()
 
     finalOfferValue ?: return null
-
-
 
     return Promotion(
         id = id,
@@ -60,6 +62,6 @@ fun PromotionEntity.toDomain(json: Json): Promotion? {
         value = finalOfferValue,
         buyQuantity = buyX,
         startTime = Instant.ofEpochSecond(startAtEpoch),
-        endTime = Instant.ofEpochSecond(endAtEpoch)
+        endTime = Instant.ofEpochSecond(endAtEpoch),
     )
 }

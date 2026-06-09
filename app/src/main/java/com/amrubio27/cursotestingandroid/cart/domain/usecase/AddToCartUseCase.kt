@@ -7,12 +7,16 @@ import com.amrubio27.cursotestingandroid.productlist.domain.repository.ProductRe
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class AddToCartUseCase @Inject constructor(
+class AddToCartUseCase
+@Inject
+constructor(
     private val cartItemRepository: CartItemRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
 ) {
-
-    suspend operator fun invoke(productId: String, quantity: Int = 1) {
+    suspend operator fun invoke(
+        productId: String,
+        quantity: Int = 1,
+    ) {
         if (quantity <= 0) {
             throw AppError.Validation.QuantityMustBePositive
         }
