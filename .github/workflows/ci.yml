@@ -164,3 +164,27 @@ jobs:
           name: instrumented-report-api${{ matrix.api-level }}
           path: app/build/reports/androidTests/connected/
           retention-days: 7
+
+  summary:
+    name: 🧾 CI summary
+    runs-on: ubuntu-latest
+    needs: [ static-analysis, unit-tests, build, instrumented-tests ]
+    if: always()
+    steps:
+      - name: Tabla resumen del pipeline
+        run: |
+          {
+            echo "## 🧾 Resumen del pipeline"
+            echo ""
+            echo "| Etapa | Resultado |"
+            echo "|---|---|"
+            echo "| 🔍 Static analysis (ktlint + detekt) | ${{ needs.static-analysis.result == 'success' && '✅ pass' || format('❌ {0}', needs.static-analysis.result) }} |"
+            echo "| 🧪 Unit tests + coverage gate | ${{ needs.unit-tests.result == 'success' && '✅ pass' || format('❌ {0}', needs.unit-tests.result) }} |"
+            echo "| 🏗️ Assemble debug | ${{ needs.build.result == 'success' && '✅ pass' || format('❌ {0}', needs.build.result) }} |"
+            echo "| 📱 Instrumented (API 26/30/34) | ${{ needs.instrumented-tests.result == 'success' && '✅ pass' || format('❌ {0}', needs.instrumented-tests.result) }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Marcar rojo si algo falló
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "Algún job del pipeline falló — revisa la tabla del Summary." >&2
+          exit 1
