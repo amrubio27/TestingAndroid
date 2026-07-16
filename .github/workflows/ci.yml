@@ -150,7 +150,9 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :app:connectedDebugAndroidTest
+          script: |
+            ./gradlew :app:connectedDebugAndroidTest
+            adb shell reboot -p || true
       - name: Publish instrumented results
         if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2
