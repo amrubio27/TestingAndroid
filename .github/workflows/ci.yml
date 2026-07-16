@@ -106,7 +106,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [ 26, 30, 34 ]
+        api-level: [ 28, 30, 34 ]
     steps:
       - name: Enable KVM
         run: |
@@ -150,9 +150,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: |
-            ./gradlew :app:connectedDebugAndroidTest
-            adb shell reboot -p || true
+          script: ./gradlew :app:connectedDebugAndroidTest
       - name: Publish instrumented results
         if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2
