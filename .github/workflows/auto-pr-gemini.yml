@@ -1,0 +1,125 @@
+name: Auto Didactic Pull Request (Gemini)
+
+on:
+  push:
+    branches-ignore:
+      - 'master'
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  generate-gemini-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Obtener Diff de los cambios
+        id: get_diff
+        run: |
+          git fetch origin master
+          git diff origin/master...HEAD > diff.txt
+          git diff origin/master...HEAD --name-only > files.txt
+
+      - name: Generar descripción de la PR con Gemini API
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PR_EXAMPLE_TEMPLATE: ${{ secrets.PR_EXAMPLE_TEMPLATE }}
+        run: |
+          python3 -c "
+          import os, json, urllib.request
+
+          MODEL_NAME = 'gemini-3.5-flash' 
+
+          try:
+              with open('files.txt', 'r') as f: files = f.read()
+              with open('diff.txt', 'r') as f: diff = f.read()
+          except Exception as e:
+              print(f'Error al leer los archivos de diff: {e}')
+              exit(1)
+
+          ejemplo = os.environ.get('PR_EXAMPLE_TEMPLATE', '')
+          if not ejemplo:
+              print('Error crítico: El Secret PR_EXAMPLE_TEMPLATE está vacío.')
+              exit(1)
+
+          prompt = f'''Actúa como un desarrollador Senior y experto en Clean Architecture.
+          Analiza el siguiente 'git diff' y la lista de archivos modificados para redactar una Pull Request extensa, didáctica y técnica centrada en los cambios realizados.
+
+          Archivos tocados en esta ocasión:
+          {files}
+
+          Diff completo actual:
+          {diff}
+
+          ---
+          INSTRUCCIONES DE ESTILO CRÍTICAS:
+          Debes imitar fielmente el estilo, la estructura de secciones, el nivel de detalle pedagógico y el formato Markdown del siguiente ejemplo real de nuestro repositorio. Adapta los conceptos técnicos a lo que veas en el 'git diff' actual, pero manteniendo la misma profundidad explicativa.
+
+          EJEMPLO DE REFERENCIA (Sigue esta estructura exacta):
+          {ejemplo}
+          ---
+
+          Genera únicamente el Markdown final de la PR para los cambios actuales, sin comentarios adicionales por tu parte.'''
+
+          url = f'https://generativelanguage.googleapis.com/v1beta/models/{MODEL_NAME}:generateContent?key={os.environ[\"GEMINI_API_KEY\"]}'
+          payload = {'contents': [{'parts': [{'text': prompt}]}]}
+          
+          req = urllib.request.Request(
+              url, 
+              data=json.dumps(payload).encode('utf-8'), 
+              headers={'Content-Type': 'application/json'}
+          )
+          
+          try:
+              response = urllib.request.urlopen(req)
+              res_data = json.loads(response.read().decode('utf-8'))
+              text = res_data['candidates'][0]['content']['parts'][0]['text']
+          
+              # --- PROCESAMIENTO DINÁMICO DEL TÍTULO ---
+              lines = text.strip().split('\n')
+              pr_title = \"Refactor: Cambios en componentes\" # Fallback seguro
+          
+              # Si la primera línea del markdown es el título principal (#), lo extraemos
+              if lines and lines[0].startswith('#'):
+                  pr_title = lines[0].lstrip('#').strip()
+                  # Opcional: removemos esa primera línea del cuerpo para que no aparezca el título duplicado en la descripción
+                  text = '\n'.join(lines[1:]).strip()
+          
+              # Guardamos el título y el cuerpo en archivos independientes
+              with open('pr_title.txt', 'w') as f:
+                  f.write(pr_title)
+              with open('pr_description.md', 'w') as f:
+                  f.write(text)
+          
+              print('Descripción y título de la PR extraídos correctamente.')
+          except Exception as e:
+              print('Error al invocar la API de Gemini:', e)
+              exit(1)
+          "
+
+      - name: Crear o actualizar Pull Request en GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CURRENT_BRANCH="${{ github.ref_name }}"
+          PR_EXISTS=$(gh pr list --head "$CURRENT_BRANCH" --state open --json url --jq '.[].url')
+          
+          # Leemos el título generado por la IA desde el archivo
+          GENERATED_TITLE=$(cat pr_title.txt)
+          
+          if [ -z "$PR_EXISTS" ]; then
+            gh pr create \
+              --base master \
+              --head "$CURRENT_BRANCH" \
+              --title "$GENERATED_TITLE" \
+              --body-file pr_description.md
+          else
+            gh pr edit "$CURRENT_BRANCH" \
+              --title "$GENERATED_TITLE" \
+              --body-file pr_description.md
+          fi
