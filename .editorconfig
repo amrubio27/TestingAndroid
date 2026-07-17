@@ -3,15 +3,8 @@ root = true
 [*.{kt,kts}]
 indent_size = 4
 max_line_length = 120
-insert_final_newline = false
-ktlint_standard_function-naming = disabled
-ktlint_standard_backing-property-naming = disabled
-ktlint_standard_max-line-length = disabled
-ktlint_standard_filename = disabled
-ktlint_standard_no-wildcard-imports = disabled
-ktlint_standard_import-ordering = disabled
-ktlint_standard_function-expression-body = disabled
-ktlint_standard_multiline-expression-wrapping = disabled
-ktlint_standard_binary-expression-wrapping = disabled
-ktlint_standard_function-signature = disabled
-ktlint_standard_class-naming = disabled
+insert_final_newline = true
+ktlint_function_naming_ignore_when_annotated_with = Composable
+
+[**/*Test.kt]
+max_line_length = 160
