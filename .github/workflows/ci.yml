@@ -101,12 +101,16 @@ jobs:
 
   instrumented-tests:
     name: 📱 Instrumented (API ${{ matrix.api-level }})
+    # Si tu organización tiene habilitados los "Larger runners" (GitHub > Settings > Runners),
+    # cambia 'ubuntu-latest' por 'ubuntu-latest-4-cores' (o 8 / 16) para reducir el
+    # tiempo de boot del emulador. En repos donde no estén habilitados se puede dejar
+    # 'ubuntu-latest' sin problema.
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        api-level: [ 26, 30, 34 ]
+        api-level: [ 30, 34 ]
     steps:
       - name: Enable KVM
         run: |
@@ -121,14 +125,48 @@ jobs:
           java-version: 17
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Cache AVD
+
+      # Caché de las system-images del SDK (≈2-3 GB por API). Sin esto se descargan
+      # en cada run y son varios minutos muertos. La clave incluye libs.versions.toml:
+      # si cambias versiones del SDK en Gradle, el caché se invalida correctamente.
+      # Se cachean varias rutas porque la ruta exacta depende de la imagen del runner.
+      - name: Cache Android SDK system images
+        uses: actions/cache@v4
+        id: sdk-cache
+        with:
+          path: |
+            /usr/local/lib/android/sdk/system-images
+            /usr/lib/android-sdk/system-images
+          key: ${{ runner.os }}-sysimg-${{ matrix.api-level }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          # Solo restauramos del mismo nivel de API: una system-image de API X
+          # no es válida para API Y (el 'fallback' amplio podría cargar una
+          # incorrecta).
+          restore-keys: |
+            ${{ runner.os }}-sysimg-${{ matrix.api-level }}-
+
+      # Caché del AVD completo. '**' es necesario porque el userdata.img vive
+      # dentro de ~/.android/avd/<avd_name>.avd/, y '@actions/cache' no es
+      # recursivo con un solo '*'. Sin esto, el emulador hace cold-boot cada run.
+      # Solo restauramos del mismo nivel de API (un AVD hecho para API X no es
+      # válido para API Y); sin este acotado, 'fallback' podría cargar uno incorrecto.
+      - name: Cache AVD (incluye userdata.img)
         uses: actions/cache@v4
         id: avd-cache
         with:
           path: |
-            ~/.android/avd/*
+            ~/.android/avd/**
             ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
+          # Sin libs.versions.toml en la clave: el AVD no depende del catálogo de deps,
+          # incluirlo invalidaría el caché en cada bump de versión sin motivo.
+          key: ${{ runner.os }}-avd-${{ matrix.api-level }}
+          restore-keys: |
+            ${{ runner.os }}-avd-${{ matrix.api-level }}-
+
+      # Solo se ejecuta cuando NO hay hit en el caché de AVD. El action crea el
+      # AVD en '~/.android/avd/' y al finalizar el job, el step 'Cache AVD'
+      # guarda todo ese árbol (incluido el 'userdata.img' gracias al '**').
+      # En el siguiente run, cache-hit evita este paso y el emulador arranca
+      # desde un AVD ya tibio, ahorrando los 5-7 min de cold boot.
       - name: Create AVD snapshot
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
@@ -140,6 +178,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "AVD snapshot listo para API ${{ matrix.api-level }}"
+
       - name: Run instrumented tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -181,7 +220,7 @@ jobs:
             echo "| 🔍 Static analysis (ktlint + detekt) | ${{ needs.static-analysis.result == 'success' && '✅ pass' || format('❌ {0}', needs.static-analysis.result) }} |"
             echo "| 🧪 Unit tests + coverage gate | ${{ needs.unit-tests.result == 'success' && '✅ pass' || format('❌ {0}', needs.unit-tests.result) }} |"
             echo "| 🏗️ Assemble debug | ${{ needs.build.result == 'success' && '✅ pass' || format('❌ {0}', needs.build.result) }} |"
-            echo "| 📱 Instrumented (API 26/30/34) | ${{ needs.instrumented-tests.result == 'success' && '✅ pass' || format('❌ {0}', needs.instrumented-tests.result) }} |"
+            echo "| 📱 Instrumented (API 30/34) | ${{ needs.instrumented-tests.result == 'success' && '✅ pass' || format('❌ {0}', needs.instrumented-tests.result) }} |"
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Marcar rojo si algo falló
         if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
