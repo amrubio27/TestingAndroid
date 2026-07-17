@@ -26,33 +26,34 @@ class ProductListViewModelTest {
         fakeProduct: ProductRepository = FakeProductRepository(),
         fakeSettings: FakeSettingsRepository = FakeSettingsRepository(),
         fakePromotion: FakePromotionRepository = FakePromotionRepository(),
-        fakeClock: FakeSystemClock = FakeSystemClock()
+        fakeClock: FakeSystemClock = FakeSystemClock(),
     ): ProductListViewModel {
-        val getProductUseCase = GetProductsUseCase(
-            fakeProduct,
-            fakePromotion,
-            GetPromotionForProduct(),
-            fakeSettings,
-            fakeClock
-        )
+        val getProductUseCase =
+            GetProductsUseCase(
+                fakeProduct,
+                fakePromotion,
+                GetPromotionForProduct(),
+                fakeSettings,
+                fakeClock,
+            )
         return ProductListViewModel(
             getProductsUseCase = getProductUseCase,
-            settingsRepository = fakeSettings
+            settingsRepository = fakeSettings,
         )
     }
 
     @Test
     fun `given products when initialized then emits success state`() =
         runTest(mainDispatcherRule.scheduler) {
-            //GIVEN
+            // GIVEN
             val productId = "id1"
             val p1 = product { withId(productId) }
             val fakeProduct = FakeProductRepository().apply { setProducts(listOf(p1)) }
 
-            //When
+            // When
             val viewModel = createViewModel(fakeProduct = fakeProduct)
 
-            //THEN
+            // THEN
             viewModel.uiState.test {
                 val state = awaitItem()
                 assertTrue(state is ProductListUiState.Success)
@@ -65,8 +66,16 @@ class ProductListViewModelTest {
     @Test
     fun `given selected category when set category then filters products`() =
         runTest(mainDispatcherRule.scheduler) {
-            val p1 = product { withId("1"); withCategory("carne") }
-            val p2 = product { withId("2"); withCategory("pasta") }
+            val p1 =
+                product {
+                    withId("1")
+                    withCategory("carne")
+                }
+            val p2 =
+                product {
+                    withId("2")
+                    withCategory("pasta")
+                }
             val fakeProduct = FakeProductRepository().apply { setProducts(listOf(p1, p2)) }
 
             val viewModel = createViewModel(fakeProduct = fakeProduct)
@@ -89,8 +98,16 @@ class ProductListViewModelTest {
     @Test
     fun `given price asc sort option when set sort option then sorts by effective price`() =
         runTest(mainDispatcherRule.scheduler) {
-            val p1 = product { withId("1"); withPrice(30.0) }
-            val p2 = product { withId("2"); withPrice(15.0) }
+            val p1 =
+                product {
+                    withId("1")
+                    withPrice(30.0)
+                }
+            val p2 =
+                product {
+                    withId("2")
+                    withPrice(15.0)
+                }
             val fakeProduct = FakeProductRepository().apply { setProducts(listOf(p1, p2)) }
 
             val viewModel = createViewModel(fakeProduct = fakeProduct)
@@ -113,9 +130,7 @@ class ProductListViewModelTest {
     @Test
     fun `given repository error when loading products then emits error state`() =
         runTest(mainDispatcherRule.scheduler) {
-
             val failingRepository = FailingProductRepositoryStub(Exception("Prueba test"))
-
 
             val viewModel = createViewModel(fakeProduct = failingRepository)
 

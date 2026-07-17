@@ -19,74 +19,77 @@ import org.junit.Rule
 import org.junit.Test
 
 class ProductListViewModelMockTest {
-
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val settingsRepository: SettingsRepository = mockk(relaxed = true) {
-        every { selectedCategory } returns flowOf(null)
-        every { sortOption } returns flowOf(SortOption.NONE)
-        every { inStockOnly } returns flowOf(false)
-        every { filtersVisible } returns flowOf(true)
-    }
+    private val settingsRepository: SettingsRepository =
+        mockk(relaxed = true) {
+            every { selectedCategory } returns flowOf(null)
+            every { sortOption } returns flowOf(SortOption.NONE)
+            every { inStockOnly } returns flowOf(false)
+            every { filtersVisible } returns flowOf(true)
+        }
 
     private fun createViewModel(
         fakeProduct: ProductRepository = FakeProductRepository(),
         fakeSettings: FakeSettingsRepository = FakeSettingsRepository(),
         fakePromotion: FakePromotionRepository = FakePromotionRepository(),
-        fakeClock: FakeSystemClock = FakeSystemClock()
+        fakeClock: FakeSystemClock = FakeSystemClock(),
     ): ProductListViewModel {
-
-        val getProductUseCase = GetProductsUseCase(
-            fakeProduct, fakePromotion, GetPromotionForProduct(), fakeSettings, fakeClock
-        )
+        val getProductUseCase =
+            GetProductsUseCase(
+                fakeProduct,
+                fakePromotion,
+                GetPromotionForProduct(),
+                fakeSettings,
+                fakeClock,
+            )
 
         return ProductListViewModel(
-            getProductsUseCase = getProductUseCase, settingsRepository = settingsRepository
+            getProductsUseCase = getProductUseCase,
+            settingsRepository = settingsRepository,
         )
     }
 
     @Test
     fun `given category when set category then delegates to settings repository`() =
         runTest(mainDispatcherRule.scheduler) {
-
-            //GIVEN
+            // GIVEN
             val viewModel = createViewModel()
             val category = "pasta"
 
-            //WHEN
+            // WHEN
             viewModel.setCategory(category)
 
-            //THEN
+            // THEN
             coVerify(exactly = 1) { settingsRepository.setSelectedCategory(category) }
-
         }
 
     @Test
     fun `given sort option when set sort option then delegates to settings repository`() =
         runTest(mainDispatcherRule.scheduler) {
-            //GIVEN
+            // GIVEN
             val viewModel = createViewModel()
             val option = SortOption.DISCOUNT
 
-            //WHEN
+            // WHEN
             viewModel.setSortOption(option)
 
-            //THEN
+            // THEN
             coVerify(exactly = 1) { settingsRepository.setSortOption(option) }
         }
 
     @Test
     fun `given filter visible when set filter visible then delegates to settings repository`() =
         runTest(mainDispatcherRule.scheduler) {
-            //GIVEN
+            // GIVEN
             val viewModel = createViewModel()
             val option = true
 
-            //WHEN
+            // WHEN
             viewModel.setFilterVisible(option)
 
-            //THEN
+            // THEN
             coVerify(exactly = 1) { settingsRepository.setFiltersVisible(option) }
         }
 }

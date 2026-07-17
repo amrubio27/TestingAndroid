@@ -48,9 +48,8 @@ import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromoti
 fun ProductDetailScreen(
     productId: String,
     onBack: () -> Unit,
-    productDetailViewModel: ProductDetailViewModel = hiltViewModel()
+    productDetailViewModel: ProductDetailViewModel = hiltViewModel(),
 ) {
-
     val insufficientStockMessage = stringResource(R.string.detail_error_insufficient_stock)
     val networkErrorMessage = stringResource(R.string.detail_error_network)
     val unknownErrorMessage = stringResource(R.string.detail_error_unknown)
@@ -89,7 +88,7 @@ fun ProductDetailScreen(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onBack = onBack,
-        onAddToCart = { productDetailViewModel.addToCart() }
+        onAddToCart = { productDetailViewModel.addToCart() },
     )
 }
 
@@ -98,28 +97,35 @@ fun ProductDetailContent(
     uiState: ProductDetailUiState,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onBack: () -> Unit,
-    onAddToCart: () -> Unit
+    onAddToCart: () -> Unit,
 ) {
     Scaffold(topBar = {
         MarketTopAppBar(
-            title = uiState.item?.product?.name.orEmpty(), onBackSelected = { onBack() })
+            title =
+                uiState.item
+                    ?.product
+                    ?.name
+                    .orEmpty(),
+            onBackSelected = { onBack() },
+        )
     }, bottomBar = {
         BottomAppBar(
-            windowInsets = BottomAppBarDefaults.windowInsets
+            windowInsets = BottomAppBarDefaults.windowInsets,
         ) {
             AddToCartButton(
                 modifier = Modifier.weight(1f),
                 product = uiState.item?.product,
                 isLoading = uiState.isLoading,
-                addToCart = onAddToCart
+                addToCart = onAddToCart,
             )
         }
     }, snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
         ) {
             if (uiState.isLoading) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -129,27 +135,29 @@ fun ProductDetailContent(
                 uiState.item?.let {
                     val product = it.product
                     val promotion = it.promotion
-                    val discountedPrice = when (promotion) {
-                        is ProductPromotion.Percent -> promotion.discountedPrice
-                        is ProductPromotion.BuyXPayY -> null
-                        null -> null
-                    }
+                    val discountedPrice =
+                        when (promotion) {
+                            is ProductPromotion.Percent -> promotion.discountedPrice
+                            is ProductPromotion.BuyXPayY -> null
+                            null -> null
+                        }
 
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                             shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         ) {
                             Column(
                                 modifier = Modifier.padding(24.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
                             ) {
                                 AsyncImage(
                                     model = product.imageUrl,
@@ -163,20 +171,22 @@ fun ProductDetailContent(
                                     product.name,
                                     style = MaterialTheme.typography.headlineMedium,
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
                                 )
 
                                 Surface(
                                     shape = RoundedCornerShape(8.dp),
-                                    color = MaterialTheme.colorScheme.secondaryContainer
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
                                 ) {
                                     Text(
                                         product.category,
-                                        modifier = Modifier.padding(
-                                            horizontal = 12.dp, vertical = 6.dp
-                                        ),
+                                        modifier =
+                                            Modifier.padding(
+                                                horizontal = 12.dp,
+                                                vertical = 6.dp,
+                                            ),
                                         style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
                                     )
                                 }
 
@@ -184,7 +194,7 @@ fun ProductDetailContent(
                                     Text(
                                         product.description,
                                         style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
 
@@ -193,37 +203,39 @@ fun ProductDetailContent(
                                 if (discountedPrice != null) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     ) {
                                         Text(
                                             product.price.toString(),
                                             style = MaterialTheme.typography.bodyLarge,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            textDecoration = TextDecoration.LineThrough
+                                            textDecoration = TextDecoration.LineThrough,
                                         )
                                         Text(
                                             discountedPrice.toString(),
                                             style = MaterialTheme.typography.displaySmall,
                                             color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Bold,
                                         )
                                     }
 
                                     Surface(
                                         shape = RoundedCornerShape(8.dp),
-                                        color = MaterialTheme.colorScheme.errorContainer
+                                        color = MaterialTheme.colorScheme.errorContainer,
                                     ) {
                                         Text(
                                             stringResource(
                                                 R.string.detail_percent_off,
-                                                (promotion as ProductPromotion.Percent).percent.toInt()
+                                                (promotion as ProductPromotion.Percent).percent.toInt(),
                                             ),
-                                            modifier = Modifier.padding(
-                                                horizontal = 12.dp, vertical = 6.dp
-                                            ),
+                                            modifier =
+                                                Modifier.padding(
+                                                    horizontal = 12.dp,
+                                                    vertical = 6.dp,
+                                                ),
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onErrorContainer
+                                            color = MaterialTheme.colorScheme.onErrorContainer,
                                         )
                                     }
                                 } else {
@@ -231,23 +243,25 @@ fun ProductDetailContent(
                                         product.price.toString(),
                                         style = MaterialTheme.typography.displaySmall,
                                         color = MaterialTheme.colorScheme.onSurface,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
                                     )
                                 }
 
                                 if (promotion is ProductPromotion.BuyXPayY) {
                                     Surface(
                                         shape = RoundedCornerShape(8.dp),
-                                        color = MaterialTheme.colorScheme.errorContainer
+                                        color = MaterialTheme.colorScheme.errorContainer,
                                     ) {
                                         Text(
                                             stringResource(R.string.detail_promo, promotion.label),
-                                            modifier = Modifier.padding(
-                                                horizontal = 12.dp, vertical = 6.dp
-                                            ),
+                                            modifier =
+                                                Modifier.padding(
+                                                    horizontal = 12.dp,
+                                                    vertical = 6.dp,
+                                                ),
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onErrorContainer
+                                            color = MaterialTheme.colorScheme.onErrorContainer,
                                         )
                                     }
                                 }
@@ -255,43 +269,52 @@ fun ProductDetailContent(
                                 HorizontalDivider()
 
                                 val hasStock = product.stock > 0
-                                val stockContainerColor = if (hasStock) {
-                                    MaterialTheme.colorScheme.primaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.errorContainer
-                                }
-                                val stockContentColor = if (hasStock) {
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.onErrorContainer
-                                }
+                                val stockContainerColor =
+                                    if (hasStock) {
+                                        MaterialTheme.colorScheme.primaryContainer
+                                    } else {
+                                        MaterialTheme.colorScheme.errorContainer
+                                    }
+                                val stockContentColor =
+                                    if (hasStock) {
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    } else {
+                                        MaterialTheme.colorScheme.onErrorContainer
+                                    }
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
                                         stringResource(R.string.detail_stock_available),
                                         style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
 
                                     Surface(
                                         shape = RoundedCornerShape(12.dp),
-                                        color = stockContainerColor
+                                        color = stockContainerColor,
                                     ) {
                                         Text(
-                                            text = if (hasStock) stringResource(
-                                                R.string.detail_stock_units,
-                                                product.stock
-                                            ) else stringResource(R.string.detail_no_stock),
-                                            modifier = Modifier.padding(
-                                                horizontal = 12.dp, vertical = 6.dp
-                                            ),
+                                            text =
+                                                if (hasStock) {
+                                                    stringResource(
+                                                        R.string.detail_stock_units,
+                                                        product.stock,
+                                                    )
+                                                } else {
+                                                    stringResource(R.string.detail_no_stock)
+                                                },
+                                            modifier =
+                                                Modifier.padding(
+                                                    horizontal = 12.dp,
+                                                    vertical = 6.dp,
+                                                ),
                                             style = MaterialTheme.typography.bodyLarge,
                                             fontWeight = FontWeight.Bold,
-                                            color = stockContentColor
+                                            color = stockContentColor,
                                         )
                                     }
                                 }

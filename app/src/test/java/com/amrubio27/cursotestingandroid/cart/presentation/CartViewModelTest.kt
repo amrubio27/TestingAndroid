@@ -23,7 +23,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class CartViewModelTest {
-
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
@@ -31,48 +30,59 @@ class CartViewModelTest {
         productRepository: ProductRepository = FakeProductRepository(),
         cartItemRepository: CartItemRepository = FakeCartItemRepository(),
         promotionRepository: PromotionRepository = FakePromotionRepository(),
-        clock: Clock = FakeSystemClock()
+        clock: Clock = FakeSystemClock(),
     ): CartViewModel {
-        val getCartSummaryUseCase = GetCartSummaryUseCase(
-            cartItemRepository,
-            productRepository,
-            promotionRepository,
-            GetPromotionForProduct(),
-            clock
-        )
+        val getCartSummaryUseCase =
+            GetCartSummaryUseCase(
+                cartItemRepository,
+                productRepository,
+                promotionRepository,
+                GetPromotionForProduct(),
+                clock,
+            )
 
         val updateCartItemUseCase = UpdateCartItemUseCase(cartItemRepository, productRepository)
 
-        val getCartItemsWithPromotionsUseCase = GetCartItemsWithPromotionsUseCase(
-            cartItemRepository,
-            productRepository,
-            promotionRepository,
-            GetPromotionForProduct(),
-            clock
-        )
+        val getCartItemsWithPromotionsUseCase =
+            GetCartItemsWithPromotionsUseCase(
+                cartItemRepository,
+                productRepository,
+                promotionRepository,
+                GetPromotionForProduct(),
+                clock,
+            )
 
         return CartViewModel(
             cartItemRepository,
             getCartSummaryUseCase,
             updateCartItemUseCase,
-            getCartItemsWithPromotionsUseCase
+            getCartItemsWithPromotionsUseCase,
         )
     }
 
     @Test
     fun `given cart data when initialized then emit success state`() =
         runTest(mainDispatcherRule.scheduler) {
-            //GIVEN
+            // GIVEN
             val productId = "1"
-            val p = product { withId(productId); withName("Pan"); withPrice(2.0) }
-            val item = cartItem { withProductId(productId); withQuantity(3) }
+            val p =
+                product {
+                    withId(productId)
+                    withName("Pan")
+                    withPrice(2.0)
+                }
+            val item =
+                cartItem {
+                    withProductId(productId)
+                    withQuantity(3)
+                }
             val fakeProductRepository = FakeProductRepository().apply { setProducts(listOf(p)) }
             val fakeCartRepository = FakeCartItemRepository().apply { setCartItems(listOf(item)) }
 
-            //WHEN
+            // WHEN
             val viewModel = createViewModel(fakeProductRepository, fakeCartRepository)
 
-            //THEN
+            // THEN
             viewModel.uiState.test {
                 val state = awaitItem() as CartUiState.Success
                 assertEquals(1, state.cartItems.size)
@@ -83,10 +93,19 @@ class CartViewModelTest {
     @Test
     fun `given quantity one when decrease quantity then removes item from cart`() =
         runTest(mainDispatcherRule.scheduler) {
-            //GIVEN
+            // GIVEN
             val productId = "1"
-            val p = product { withId(productId); withStock(5); withPrice(2.0) }
-            val item = cartItem { withProductId(productId); withQuantity(1) }
+            val p =
+                product {
+                    withId(productId)
+                    withStock(5)
+                    withPrice(2.0)
+                }
+            val item =
+                cartItem {
+                    withProductId(productId)
+                    withQuantity(1)
+                }
             val fakeProductRepository = FakeProductRepository().apply { setProducts(listOf(p)) }
             val fakeCartRepository = FakeCartItemRepository().apply { setCartItems(listOf(item)) }
             val viewModel = createViewModel(fakeProductRepository, fakeCartRepository)
@@ -94,10 +113,10 @@ class CartViewModelTest {
             viewModel.uiState.test {
                 awaitItem()
 
-                //WHEN
+                // WHEN
                 viewModel.decreaseQuantity(productId, 1)
 
-                //THEN
+                // THEN
                 val state = awaitItem() as CartUiState.Success
                 assertTrue(state.cartItems.isEmpty())
                 assertEquals(0.0, state.summary?.finalTotal ?: 0.0, 0.001)
@@ -109,14 +128,21 @@ class CartViewModelTest {
     fun `given insufficient stock when update quantity then emits error event`() =
         runTest(mainDispatcherRule.scheduler) {
             val productId = "1"
-            val p = product { withId(productId); withStock(2) }
-            val item = cartItem { withProductId(productId); withQuantity(1) }
+            val p =
+                product {
+                    withId(productId)
+                    withStock(2)
+                }
+            val item =
+                cartItem {
+                    withProductId(productId)
+                    withQuantity(1)
+                }
             val fakeProductRepository = FakeProductRepository().apply { setProducts(listOf(p)) }
             val fakeCartRepository = FakeCartItemRepository().apply { setCartItems(listOf(item)) }
             val viewModel = createViewModel(fakeProductRepository, fakeCartRepository)
 
             viewModel.event.test {
-
                 viewModel.increaseQuantity(productId, 5)
 
                 val event = awaitItem()
@@ -124,5 +150,4 @@ class CartViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
-
 }

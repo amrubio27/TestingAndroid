@@ -6,10 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProductsResponse(
     @SerialName("products")
-    val products: List<ProductResponse>
-) {
-
-}
+    val products: List<ProductResponse>,
+)
 
 @Serializable
 data class ProductResponse(
@@ -26,6 +24,5 @@ data class ProductResponse(
     @SerialName("stock")
     val stock: Int? = null,
     @SerialName("imageUrl")
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
 )
-

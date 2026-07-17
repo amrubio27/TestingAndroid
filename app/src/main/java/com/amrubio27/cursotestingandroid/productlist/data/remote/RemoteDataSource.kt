@@ -9,29 +9,29 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-class RemoteDataSource @Inject constructor(
-    val miniMarketApiService: MiniMarketApiService
+class RemoteDataSource
+@Inject
+constructor(
+    val miniMarketApiService: MiniMarketApiService,
 ) {
-    suspend fun getProducts(): Result<List<ProductResponse>> {
-        return try {
+    suspend fun getProducts(): Result<List<ProductResponse>> =
+        try {
             val response = miniMarketApiService.getProducts()
             Result.success(response.products)
         } catch (e: Exception) {
             Result.failure(exception = mapToDomainError(e))
         }
-    }
 
-    suspend fun getPromotions(): Result<List<PromotionResponse>> {
-        return try {
+    suspend fun getPromotions(): Result<List<PromotionResponse>> =
+        try {
             val response = miniMarketApiService.getPromotions()
             Result.success(response.promotions)
         } catch (e: Exception) {
             Result.failure(exception = mapToDomainError(e))
         }
-    }
 
-    private fun mapToDomainError(e: Exception): AppError {
-        return when (e) {
+    private fun mapToDomainError(e: Exception): AppError =
+        when (e) {
             is UnknownHostException -> AppError.NetworkError
             is SocketTimeoutException -> AppError.NetworkError
             is IOException -> AppError.NetworkError
@@ -45,4 +45,3 @@ class RemoteDataSource @Inject constructor(
             else -> AppError.UnknownError(e.message)
         }
     }
-}

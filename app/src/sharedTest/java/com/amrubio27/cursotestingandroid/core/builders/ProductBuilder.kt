@@ -12,22 +12,29 @@ class ProductBuilder {
     private var category: String = "Categoría de pruebas"
 
     fun withId(id: String) = apply { this.id = id }
+
     fun withName(name: String) = apply { this.name = name }
+
     fun withDescription(description: String) = apply { this.description = description }
+
     fun withPrice(price: Double) = apply { this.price = price }
+
     fun withStock(stock: Int) = apply { this.stock = stock }
+
     fun withImageUrl(imageUrl: String?) = apply { this.imageUrl = imageUrl }
+
     fun withCategory(category: String) = apply { this.category = category }
 
-    fun build() = Product(
-        id = id,
-        name = name,
-        description = description,
-        price = price,
-        stock = stock,
-        imageUrl = imageUrl,
-        category = category
-    )
+    fun build() =
+        Product(
+            id = id,
+            name = name,
+            description = description,
+            price = price,
+            stock = stock,
+            imageUrl = imageUrl,
+            category = category,
+        )
 }
 
 fun product(block: ProductBuilder.() -> Unit = {}) = ProductBuilder().apply(block).build()

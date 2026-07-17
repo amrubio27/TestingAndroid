@@ -3,16 +3,14 @@ package com.amrubio27.cursotestingandroid.cart.data.mapper
 import com.amrubio27.cursotestingandroid.cart.data.local.database.entity.CartItemEntity
 import com.amrubio27.cursotestingandroid.cart.domain.model.CartItem
 
-fun CartItemEntity.toDomain(): CartItem {
-    return CartItem(
+fun CartItemEntity.toDomain(): CartItem =
+    CartItem(
         productId = productId,
-        quantity = quantity
+        quantity = quantity,
     )
-}
 
-fun CartItem.toEntity(): CartItemEntity {
-    return CartItemEntity(
+fun CartItem.toEntity(): CartItemEntity =
+    CartItemEntity(
         productId = productId,
-        quantity = quantity
+        quantity = quantity,
     )
-}

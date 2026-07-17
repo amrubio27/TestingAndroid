@@ -4,5 +4,5 @@ import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPro
 
 data class ProductDetailUiState(
     val item: ProductWithPromotion? = null,
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
 )

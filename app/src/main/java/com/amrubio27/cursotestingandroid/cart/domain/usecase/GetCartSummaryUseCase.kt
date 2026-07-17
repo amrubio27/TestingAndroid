@@ -18,17 +18,19 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
-class GetCartSummaryUseCase @Inject constructor(
+class GetCartSummaryUseCase
+@Inject
+constructor(
     private val cartItemRepository: CartItemRepository,
     private val productRepository: ProductRepository,
     private val promotionRepository: PromotionRepository,
     private val getPromotionForProduct: GetPromotionForProduct,
-    private val clock: Clock
+    private val clock: Clock,
 ) {
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    operator fun invoke(): Flow<CartSummary> {
-        return cartItemRepository.getCartItems()
+    operator fun invoke(): Flow<CartSummary> =
+        cartItemRepository
+            .getCartItems()
             .flatMapLatest { cartItems ->
                 val ids = cartItems.mapTo(mutableSetOf()) { it.productId }
                 if (ids.isEmpty()) {
@@ -36,19 +38,18 @@ class GetCartSummaryUseCase @Inject constructor(
                 } else {
                     combine(
                         productRepository.getProductsByIds(ids),
-                        promotionRepository.getActivePromotions()
+                        promotionRepository.getActivePromotions(),
                     ) { products, promotions ->
                         calculateSummary(cartItems, products, promotions, clock)
                     }
                 }
             }
-    }
 
     private fun calculateSummary(
         cartItems: List<CartItem>,
         products: List<Product>,
         promotions: List<Promotion>,
-        clock: Clock
+        clock: Clock,
     ): CartSummary {
         val now = clock.now()
         val activePromotions = promotions.activeAt(now)
@@ -62,11 +63,12 @@ class GetCartSummaryUseCase @Inject constructor(
             val itemTotal = product.price * cartItem.quantity
             subtotal += itemTotal
 
-            discountTotal += calculateDiscountForProduct(
-                product = product,
-                quantity = cartItem.quantity,
-                activePromotions = activePromotions
-            )
+            discountTotal +=
+                calculateDiscountForProduct(
+                    product = product,
+                    quantity = cartItem.quantity,
+                    activePromotions = activePromotions,
+                )
         }
         val total = (subtotal - discountTotal).coerceAtLeast(0.0)
         return CartSummary(subtotal = subtotal, discountTotal = discountTotal, finalTotal = total)
@@ -75,9 +77,8 @@ class GetCartSummaryUseCase @Inject constructor(
     private fun calculateDiscountForProduct(
         product: Product,
         quantity: Int,
-        activePromotions: List<Promotion>
+        activePromotions: List<Promotion>,
     ): Double {
-
         val selectedPromotion = getPromotionForProduct(product, activePromotions)
 
         return when (selectedPromotion) {

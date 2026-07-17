@@ -22,7 +22,7 @@ import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP
 fun MarketTopAppBar(
     modifier: Modifier = Modifier,
     onBackSelected: () -> Unit,
-    title: String
+    title: String,
 ) {
     TopAppBar(
         modifier = modifier,
@@ -30,7 +30,7 @@ fun MarketTopAppBar(
             Text(
                 title,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         },
         navigationIcon = {
@@ -38,19 +38,20 @@ fun MarketTopAppBar(
                 modifier = Modifier.testTag(TOP_APP_BAR),
                 onClick = {
                     onBackSelected()
-                }
+                },
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back_button_content_desc),
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        )
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
     )
 }

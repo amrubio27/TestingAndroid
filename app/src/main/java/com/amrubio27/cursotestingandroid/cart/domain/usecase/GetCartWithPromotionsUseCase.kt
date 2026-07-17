@@ -15,14 +15,15 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
-class GetCartItemsWithPromotionsUseCase @Inject constructor(
+class GetCartItemsWithPromotionsUseCase
+@Inject
+constructor(
     private val cartItemRepository: CartItemRepository,
     private val productRepository: ProductRepository,
     private val promotionRepository: PromotionRepository,
     private val getPromotionForProduct: GetPromotionForProduct,
-    private val clock: Clock
+    private val clock: Clock,
 ) {
-
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<List<CartItemWithPromotion>> {
         return cartItemRepository.getCartItems().flatMapLatest { cartItems ->
@@ -32,7 +33,7 @@ class GetCartItemsWithPromotionsUseCase @Inject constructor(
             } else {
                 combine(
                     productRepository.getProductsByIds(ids),
-                    promotionRepository.getActivePromotions()
+                    promotionRepository.getActivePromotions(),
                 ) { products, promotions ->
                     val now = clock.now()
                     val activePromotions = promotions.activeAt(now)

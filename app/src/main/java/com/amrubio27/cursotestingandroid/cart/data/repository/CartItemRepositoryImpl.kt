@@ -10,15 +10,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class CartItemRepositoryImpl @Inject constructor(private val localDataSource: LocalDataSource) :
-    CartItemRepository {
-
-    override fun getCartItems(): Flow<List<CartItem>> {
-        return localDataSource.getAllCartItems()
+class CartItemRepositoryImpl
+@Inject
+constructor(
+    private val localDataSource: LocalDataSource,
+) : CartItemRepository {
+    override fun getCartItems(): Flow<List<CartItem>> =
+        localDataSource
+            .getAllCartItems()
             .map { entities -> entities.map { it.toDomain() } }
-    }
 
-    override suspend fun addToCart(productId: String, quantity: Int) {
+    override suspend fun addToCart(
+        productId: String,
+        quantity: Int,
+    ) {
         val existingItem = localDataSource.getCartItemById(productId)
         if (existingItem != null) {
             val newQuantity = existingItem.quantity + quantity
@@ -33,7 +38,10 @@ class CartItemRepositoryImpl @Inject constructor(private val localDataSource: Lo
         localDataSource.deleteCartItem(item)
     }
 
-    override suspend fun updateQuantity(productId: String, quantity: Int) {
+    override suspend fun updateQuantity(
+        productId: String,
+        quantity: Int,
+    ) {
         val item = localDataSource.getCartItemById(productId) ?: throw AppError.NotFoundError
         localDataSource.updateCartItem(item.copy(quantity = quantity))
     }
@@ -42,7 +50,6 @@ class CartItemRepositoryImpl @Inject constructor(private val localDataSource: Lo
         localDataSource.clearCart()
     }
 
-    override suspend fun getCartItemById(productId: String): CartItem? {
-        return localDataSource.getCartItemById(productId)?.toDomain()
+    override suspend fun getCartItemById(productId: String): CartItem? =
+        localDataSource.getCartItemById(productId)?.toDomain()
     }
-}

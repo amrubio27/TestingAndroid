@@ -34,67 +34,74 @@ fun HomeTopAppBar(
     onFilterSelected: (Boolean) -> Unit,
     onSettingsSelected: () -> Unit = {},
     onCartSelected: () -> Unit,
-    cartItemCount: Int
+    cartItemCount: Int,
 ) {
     TopAppBar(
         title = {
             Text(
                 stringResource(R.string.product_list_app_title),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = Bold
+                fontWeight = Bold,
             )
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
         actions = {
             IconButton(
                 modifier = Modifier.testTag(TOP_APP_BAR_FILTER),
-                onClick = { onFilterSelected(!filtersVisible) }
+                onClick = { onFilterSelected(!filtersVisible) },
             ) {
                 Icon(
                     imageVector = Icons.Default.FilterList,
-                    contentDescription = if (filtersVisible) stringResource(R.string.product_list_hide_filters) else stringResource(
-                        R.string.product_list_show_filters
-                    ),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    contentDescription =
+                        if (filtersVisible) {
+                            stringResource(R.string.product_list_hide_filters)
+                        } else {
+                            stringResource(
+                                R.string.product_list_show_filters,
+                            )
+                        },
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
             IconButton(
                 modifier = Modifier.testTag(TOP_APP_BAR_SETTINGS),
-                onClick = { onSettingsSelected() }
+                onClick = { onSettingsSelected() },
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
             BadgedBox(modifier = Modifier.padding(end = 4.dp), badge = {
                 if (cartItemCount > 0) {
                     Badge(
-                        modifier = Modifier.testTag(TOP_APP_BAR_BADGE)
+                        modifier = Modifier.testTag(TOP_APP_BAR_BADGE),
                     ) {
                         Text(
                             if (cartItemCount > 99) "99+" else cartItemCount.toString(),
                             style = MaterialTheme.typography.labelSmall,
-                            fontWeight = Bold
+                            fontWeight = Bold,
                         )
                     }
                 }
             }) {
                 IconButton(
                     modifier = Modifier.testTag(TOP_APP_BAR_CART),
-                    onClick = { onCartSelected() }) {
+                    onClick = { onCartSelected() },
+                ) {
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }

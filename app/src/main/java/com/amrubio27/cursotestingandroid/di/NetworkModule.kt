@@ -19,20 +19,18 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     @Provides
     @Singleton
     @Named("baseUrl")
-    fun provideBaseUrl(): String {
-        return "https://raw.githubusercontent.com/amrubio27/minimarket-api/main/"
-    }
+    fun provideBaseUrl(): String = "https://raw.githubusercontent.com/amrubio27/minimarket-api/main/"
 
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
-        val logginInterceptor: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
+        val logginInterceptor: HttpLoggingInterceptor =
+            HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            }
 
         val builder = OkHttpClient.Builder()
         if (BuildConfig.DEBUG) {
@@ -47,24 +45,23 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideJson(): Json {
-        return Json {
+    fun provideJson(): Json =
+        Json {
             ignoreUnknownKeys = true
             isLenient = true
             coerceInputValues = true
         }
-    }
-
 
     @Provides
     @Singleton
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
         json: Json,
-        @Named("baseUrl") baseUrl: String
+        @Named("baseUrl") baseUrl: String,
     ): Retrofit {
         val contentType = "application/json".toMediaType()
-        return Retrofit.Builder()
+        return Retrofit
+            .Builder()
             .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(contentType))
@@ -73,7 +70,6 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideMiniMarketApiService(retrofit: Retrofit): MiniMarketApiService {
-        return retrofit.create(MiniMarketApiService::class.java)
-    }
+    fun provideMiniMarketApiService(retrofit: Retrofit): MiniMarketApiService =
+        retrofit.create(MiniMarketApiService::class.java)
 }

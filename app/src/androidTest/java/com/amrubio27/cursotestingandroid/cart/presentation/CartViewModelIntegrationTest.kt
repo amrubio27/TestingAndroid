@@ -29,12 +29,10 @@ import org.junit.runner.RunWith
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class CartViewModelIntegrationTest {
-
     private companion object {
         const val PRODUCT_ID = "p1"
         const val UPDATED_QUANTITY = 2
         const val INITIAL_QUANTITY = 1
-
     }
 
     @get:Rule(order = 0)
@@ -65,16 +63,18 @@ class CartViewModelIntegrationTest {
     lateinit var getCartItemsWithPromotionsUseCase: GetCartItemsWithPromotionsUseCase
 
     @Before
-    fun setUp() = runTest {
-        mockWebServer.server.dispatcher = MiniMarketApiDispatcher(
-            productJson = "products_list_default.json".asAsset()
-        )
-        hilt.inject()
-        cartItemRepository.clearCart()
+    fun setUp() =
+        runTest {
+            mockWebServer.server.dispatcher =
+                MiniMarketApiDispatcher(
+                    productJson = "products_list_default.json".asAsset(),
+                )
+            hilt.inject()
+            cartItemRepository.clearCart()
 
-        productRepository.refreshProducts()
-        promotionRepository.refreshPromotions()
-    }
+            productRepository.refreshProducts()
+            promotionRepository.refreshPromotions()
+        }
 
     @After
     fun tearDown() {
@@ -82,15 +82,15 @@ class CartViewModelIntegrationTest {
     }
 
     @Test
-    fun givenCartWithItems_whenViewModelCollectsUiState_thenSuccessWithSummary() = runTest {
-        cartItemRepository.addToCart(PRODUCT_ID, UPDATED_QUANTITY)
+    fun givenCartWithItems_whenViewModelCollectsUiState_thenSuccessWithSummary() =
+        runTest {
+            cartItemRepository.addToCart(PRODUCT_ID, UPDATED_QUANTITY)
 
-        val viewModel: CartViewModel = createViewModel()
+            val viewModel: CartViewModel = createViewModel()
 
-        viewModel.uiState.test {
-
-            //forma2
-            /*val result = awaitStateMatching { state ->
+            viewModel.uiState.test {
+                /* forma2
+            val result = awaitStateMatching { state ->
                 state is CartUiState.Success &&
                         state.summary != null &&
                         state.cartItems.isNotEmpty()
@@ -98,33 +98,30 @@ class CartViewModelIntegrationTest {
 
             val success = result as CartUiState.Success*/
 
+                // forma 1
+                val result =
+                    awaitSuccessMatching { state ->
+                        state.summary != null && state.cartItems.isNotEmpty()
+                    }
 
-            //forma 1
-            val result = awaitSuccessMatching { state ->
-                state.summary != null && state.cartItems.isNotEmpty()
+                assertTrue(result.cartItems.isNotEmpty())
+                assertTrue(result.summary != null)
+                assertEquals(20.0, result.summary!!.subtotal, 0.01)
+
+                cancelAndIgnoreRemainingEvents()
             }
-
-            assertTrue(result.cartItems.isNotEmpty())
-            assertTrue(result.summary != null)
-            assertEquals(20.0, result.summary!!.subtotal, 0.01)
-
-            cancelAndIgnoreRemainingEvents()
         }
-    }
 
-    private fun createViewModel(): CartViewModel {
-        return CartViewModel(
+    private fun createViewModel(): CartViewModel =
+        CartViewModel(
             cartItemRepository = cartItemRepository,
             getCartSummaryUseCase = getCartSummaryUseCase,
             updateCartItemUseCase = updateCartItemUseCase,
-            getCartItemsWithPromotionsUseCase = getCartItemsWithPromotionsUseCase
+            getCartItemsWithPromotionsUseCase = getCartItemsWithPromotionsUseCase,
         )
-    }
 
-    //forma1
-    private suspend fun ReceiveTurbine<CartUiState>.awaitSuccessMatching(
-        predicate: (CartUiState.Success) -> Boolean
-    ): CartUiState.Success {
+    // forma1
+    private suspend fun ReceiveTurbine<CartUiState>.awaitSuccessMatching(predicate: (CartUiState.Success) -> Boolean): CartUiState.Success {
         while (true) {
             when (val item: CartUiState = awaitItem()) {
                 is CartUiState.Success -> if (predicate(item)) return item
@@ -135,63 +132,78 @@ class CartViewModelIntegrationTest {
     }
 
     @Test
-    fun givenSingleProduct_whenIncreaseQuantity_thenQuantityUpdates() = runTest {
-        cartItemRepository.addToCart(PRODUCT_ID, INITIAL_QUANTITY)
+    fun givenSingleProduct_whenIncreaseQuantity_thenQuantityUpdates() =
+        runTest {
+            cartItemRepository.addToCart(PRODUCT_ID, INITIAL_QUANTITY)
 
-        val viewModel: CartViewModel = createViewModel()
+            val viewModel: CartViewModel = createViewModel()
 
-        viewModel.uiState.test {
-            val success: CartUiState.Success = awaitSuccessMatching { state ->
-                state.cartItems.any {
-                    it.cartItem.productId == PRODUCT_ID && it.cartItem.quantity == INITIAL_QUANTITY
-                }
+            viewModel.uiState.test {
+                val success: CartUiState.Success =
+                    awaitSuccessMatching { state ->
+                        state.cartItems.any {
+                            it.cartItem.productId == PRODUCT_ID && it.cartItem.quantity == INITIAL_QUANTITY
+                        }
+                    }
+
+                assertEquals(
+                    INITIAL_QUANTITY,
+                    success.cartItems
+                        .first()
+                        .cartItem.quantity,
+                )
+
+                viewModel.increaseQuantity(PRODUCT_ID, INITIAL_QUANTITY)
+
+                val updatedSuccess: CartUiState.Success =
+                    awaitSuccessMatching { state ->
+                        state.cartItems.any {
+                            it.cartItem.productId == PRODUCT_ID && it.cartItem.quantity == UPDATED_QUANTITY
+                        }
+                    }
+
+                assertEquals(
+                    UPDATED_QUANTITY,
+                    updatedSuccess.cartItems
+                        .first()
+                        .cartItem.quantity,
+                )
+
+                cancelAndIgnoreRemainingEvents()
             }
-
-            assertEquals(
-                INITIAL_QUANTITY, success.cartItems.first().cartItem.quantity
-            )
-
-            viewModel.increaseQuantity(PRODUCT_ID, INITIAL_QUANTITY)
-
-            val updatedSuccess: CartUiState.Success = awaitSuccessMatching { state ->
-                state.cartItems.any {
-                    it.cartItem.productId == PRODUCT_ID && it.cartItem.quantity == UPDATED_QUANTITY
-                }
-            }
-
-            assertEquals(
-                UPDATED_QUANTITY, updatedSuccess.cartItems.first().cartItem.quantity
-            )
-
-            cancelAndIgnoreRemainingEvents()
         }
-    }
 
     @Test
-    fun givenSingleProduct_whenDecreaseToZero_thenCartBecomesEmpty() = runTest {
-        cartItemRepository.addToCart(PRODUCT_ID, INITIAL_QUANTITY)
+    fun givenSingleProduct_whenDecreaseToZero_thenCartBecomesEmpty() =
+        runTest {
+            cartItemRepository.addToCart(PRODUCT_ID, INITIAL_QUANTITY)
 
-        val viewModel: CartViewModel = createViewModel()
+            val viewModel: CartViewModel = createViewModel()
 
-        viewModel.uiState.test {
-            val success: CartUiState.Success = awaitSuccessMatching { state ->
-                state.cartItems.any {
-                    it.cartItem.productId == PRODUCT_ID && it.cartItem.quantity == INITIAL_QUANTITY
-                }
+            viewModel.uiState.test {
+                val success: CartUiState.Success =
+                    awaitSuccessMatching { state ->
+                        state.cartItems.any {
+                            it.cartItem.productId == PRODUCT_ID && it.cartItem.quantity == INITIAL_QUANTITY
+                        }
+                    }
+
+                assertEquals(
+                    INITIAL_QUANTITY,
+                    success.cartItems
+                        .first()
+                        .cartItem.quantity,
+                )
+
+                viewModel.decreaseQuantity(productId = PRODUCT_ID, currentQuantity = INITIAL_QUANTITY)
+
+                val emptySuccess: CartUiState.Success =
+                    awaitSuccessMatching { state ->
+                        state.cartItems.isEmpty()
+                    }
+
+                assertTrue(emptySuccess.cartItems.isEmpty())
+                cancelAndIgnoreRemainingEvents()
             }
-
-            assertEquals(
-                INITIAL_QUANTITY, success.cartItems.first().cartItem.quantity
-            )
-
-            viewModel.decreaseQuantity(productId = PRODUCT_ID, currentQuantity = INITIAL_QUANTITY)
-
-            val emptySuccess: CartUiState.Success = awaitSuccessMatching { state ->
-                state.cartItems.isEmpty()
-            }
-
-            assertTrue(emptySuccess.cartItems.isEmpty())
-            cancelAndIgnoreRemainingEvents()
         }
-    }
 }

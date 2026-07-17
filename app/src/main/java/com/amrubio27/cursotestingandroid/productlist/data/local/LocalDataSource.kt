@@ -10,19 +10,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
-class LocalDataSource @Inject constructor(
+class LocalDataSource
+@Inject
+constructor(
     private val productDao: ProductDao,
     private val promotionDao: PromotionDao,
-    private val cartItemDao: CartItemDao
+    private val cartItemDao: CartItemDao,
 ) {
     fun getAllProducts(): Flow<List<ProductEntity>> = productDao.getAllProducts()
-    fun getAllPromotions(): Flow<List<PromotionEntity>> = promotionDao.getAllPromotions()
 
+    fun getAllPromotions(): Flow<List<PromotionEntity>> = promotionDao.getAllPromotions()
 
     suspend fun saveProducts(products: List<ProductEntity>) = productDao.replaceAll(products)
 
-    suspend fun savePromotions(promotions: List<PromotionEntity>) =
-        promotionDao.replaceAll(promotions)
+    suspend fun savePromotions(promotions: List<PromotionEntity>) = promotionDao.replaceAll(promotions)
 
     fun getProductById(id: String): Flow<ProductEntity?> = productDao.getProductById(id)
 
@@ -35,42 +36,37 @@ class LocalDataSource @Inject constructor(
 
     fun getAllCartItems(): Flow<List<CartItemEntity>> = cartItemDao.getAllCartItems()
 
-    suspend fun getCartItemById(productId: String): CartItemEntity? =
-        cartItemDao.getCartItemById(productId)
+    suspend fun getCartItemById(productId: String): CartItemEntity? = cartItemDao.getCartItemById(productId)
 
-    suspend fun updateCartItem(cartItemEntity: CartItemEntity): Result<Unit> {
-        return try {
+    suspend fun updateCartItem(cartItemEntity: CartItemEntity): Result<Unit> =
+        try {
             cartItemDao.updateCartItem(cartItemEntity)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
-    suspend fun deleteCartItem(cartItemEntity: CartItemEntity): Result<Unit> {
-        return try {
+    suspend fun deleteCartItem(cartItemEntity: CartItemEntity): Result<Unit> =
+        try {
             cartItemDao.deleteCartItem(cartItemEntity)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
-    suspend fun clearCart(): Result<Unit> {
-        return try {
+    suspend fun clearCart(): Result<Unit> =
+        try {
             cartItemDao.clearCart()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
-    suspend fun insertCartItem(itemEntity: CartItemEntity): Result<Unit> {
-        return try {
+    suspend fun insertCartItem(itemEntity: CartItemEntity): Result<Unit> =
+        try {
             cartItemDao.insertCartItem(itemEntity)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-}

@@ -9,9 +9,8 @@ fun AddToCartButton(
     modifier: Modifier = Modifier,
     product: Product?,
     isLoading: Boolean,
-    addToCart: () -> Unit
+    addToCart: () -> Unit,
 ) {
-
     product?.let {
         if (it.stock > 0) {
             AddToCartButtonWithStock(modifier, it, isLoading, addToCart)
@@ -19,5 +18,4 @@ fun AddToCartButton(
             AddToCartButtonNoStock(modifier)
         }
     }
-
 }

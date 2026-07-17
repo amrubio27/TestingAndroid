@@ -8,17 +8,18 @@ import com.amrubio27.cursotestingandroid.productlist.presentation.ProductListUiS
 
 object ProductListUiStateMother {
     fun success(
-        products: List<ProductWithPromotion> = listOf(
-            ProductWithPromotion(ProductMother.coffee(), PromotionMother.percent()),
-            ProductWithPromotion(ProductMother.bread()),
-            ProductWithPromotion(ProductMother.milk()),
+        products: List<ProductWithPromotion> =
+            listOf(
+                ProductWithPromotion(ProductMother.coffee(), PromotionMother.percent()),
+                ProductWithPromotion(ProductMother.bread()),
+                ProductWithPromotion(ProductMother.milk()),
             /*ProductWithPromotion(product {withId("123")}),
             ProductWithPromotion(product {withId("1234")}),
             ProductWithPromotion(product {withId("12345")}),
             ProductWithPromotion(product {withId("1234556")}),*/
-        ),
+            ),
         categories: List<String> = listOf("bread", "drinks", "lacteo"),
         selectedCategory: String? = null,
-        sortOption: SortOption = SortOption.NONE
+        sortOption: SortOption = SortOption.NONE,
     ) = ProductListUiState.Success(products, categories, selectedCategory, sortOption)
 }

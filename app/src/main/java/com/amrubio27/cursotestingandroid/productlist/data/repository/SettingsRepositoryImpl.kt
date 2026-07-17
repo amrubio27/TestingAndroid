@@ -17,26 +17,27 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class SettingsRepositoryImpl @Inject constructor(
-    private val dataStore: DataStore<Preferences>
+class SettingsRepositoryImpl
+@Inject
+constructor(
+    private val dataStore: DataStore<Preferences>,
 ) : SettingsRepository {
-
     companion object {
         private val IN_STOCK_ONLY_KEY = booleanPreferencesKey("IN_STOCK_ONLY_KEY")
         private val FILTERS_VISIBLE_KEY = booleanPreferencesKey("FILTERS_VISIBLE_KEY")
         private val SELECTED_CATEGORY_KEY = stringPreferencesKey("SELECTED_CATEGORY_KEY")
         private val THEME_MODE_KEY = intPreferencesKey("THEME_MODE_KEY")
         private val SORT_OPTION_KEY = stringPreferencesKey("SORT_OPTION_KEY")
-
     }
 
-    private val dataStoreFlow: Flow<Preferences> = dataStore.data.catch { exception ->
-        if (exception is androidx.datastore.core.IOException) {
-            emit(emptyPreferences())
-        } else {
-            throw exception
+    private val dataStoreFlow: Flow<Preferences> =
+        dataStore.data.catch { exception ->
+            if (exception is androidx.datastore.core.IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
         }
-    }
 
     override val inStockOnly: Flow<Boolean> =
         dataStoreFlow.map { preferences -> preferences[IN_STOCK_ONLY_KEY] ?: false }
@@ -47,23 +48,25 @@ class SettingsRepositoryImpl @Inject constructor(
     override val filtersVisible: Flow<Boolean> =
         dataStoreFlow.map { preferences -> preferences[FILTERS_VISIBLE_KEY] ?: true }
 
-    override val themeMode: Flow<ThemeMode> = dataStoreFlow.map { preferences ->
-        when (preferences[THEME_MODE_KEY]) {
-            ThemeMode.SYSTEM.id -> ThemeMode.SYSTEM
-            ThemeMode.LIGHT.id -> ThemeMode.LIGHT
-            ThemeMode.DARK.id -> ThemeMode.DARK
-            else -> ThemeMode.SYSTEM
+    override val themeMode: Flow<ThemeMode> =
+        dataStoreFlow.map { preferences ->
+            when (preferences[THEME_MODE_KEY]) {
+                ThemeMode.SYSTEM.id -> ThemeMode.SYSTEM
+                ThemeMode.LIGHT.id -> ThemeMode.LIGHT
+                ThemeMode.DARK.id -> ThemeMode.DARK
+                else -> ThemeMode.SYSTEM
+            }
         }
-    }
 
-    override val sortOption: Flow<SortOption> = dataStoreFlow.map { preferences ->
-        val raw = preferences[SORT_OPTION_KEY]
-        runCatching {
-            SortOption.valueOf(
-                raw ?: SortOption.NONE.name
-            )
-        }.getOrDefault(SortOption.NONE)
-    }
+    override val sortOption: Flow<SortOption> =
+        dataStoreFlow.map { preferences ->
+            val raw = preferences[SORT_OPTION_KEY]
+            runCatching {
+                SortOption.valueOf(
+                    raw ?: SortOption.NONE.name,
+                )
+            }.getOrDefault(SortOption.NONE)
+        }
 
     override suspend fun setInStockOnly(value: Boolean) {
         dataStore.edit { preferences ->

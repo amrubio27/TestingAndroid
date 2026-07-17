@@ -21,24 +21,25 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-class PromotionRepositoryImpl @Inject constructor(
+class PromotionRepositoryImpl
+@Inject
+constructor(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
     private val dispatchersProvider: DispatchersProvider,
-    private val json: Json
+    private val json: Json,
 ) : PromotionRepository {
-
     private val refreshScope = CoroutineScope(SupervisorJob() + dispatchersProvider.io)
     private val refreshMutex = Mutex()
 
     override fun getActivePromotions(): Flow<List<Promotion>> {
-        return localDataSource.getAllPromotions()
+        return localDataSource
+            .getAllPromotions()
             .map { entities ->
                 entities.mapNotNull {
                     it.toDomain(json)
                 }
-            }
-            .onStart {
+            }.onStart {
                 refreshScope.launch {
                     if (!refreshMutex.tryLock()) return@launch
                     try {
@@ -47,11 +48,9 @@ class PromotionRepositoryImpl @Inject constructor(
                     } finally {
                         refreshMutex.unlock()
                     }
-
                 }
-            }
-            .catch {
-                //Log
+            }.catch {
+                // Log
             }
     }
 

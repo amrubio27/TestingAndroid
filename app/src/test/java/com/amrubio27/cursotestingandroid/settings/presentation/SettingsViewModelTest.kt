@@ -20,9 +20,10 @@ class SettingsViewModelTest {
     @Test
     fun `GIVEN repository with values WHEN viewmodel is initialized THEN uistate is updated`() =
         runTest(mainDispatcherRule.scheduler) {
-            val settingsRepository = FakeSettingsRepository().apply {
-                setInStockOnly(true)
-            }
+            val settingsRepository =
+                FakeSettingsRepository().apply {
+                    setInStockOnly(true)
+                }
 
             val viewModel = SettingsViewModel(settingsRepository)
 
@@ -36,17 +37,17 @@ class SettingsViewModelTest {
     @Test
     fun `given viewmodel when theme mode is changed then ui stated and repository are updated`() =
         runTest(mainDispatcherRule.scheduler) {
-            //GIVEN
+            // GIVEN
             val settingsRepository = FakeSettingsRepository()
             val viewModel = SettingsViewModel(settingsRepository)
 
             viewModel.uiState.test {
                 awaitItem()
 
-                //WHEN
+                // WHEN
                 viewModel.setThemeMode(ThemeMode.DARK)
 
-                //THEN
+                // THEN
                 val updateState = awaitItem()
                 assertEquals(ThemeMode.DARK, updateState.themeMode)
 
@@ -59,17 +60,17 @@ class SettingsViewModelTest {
     @Test
     fun `given viewmodel when in stock only is changed then ui stated and repository are updated`() =
         runTest(mainDispatcherRule.scheduler) {
-            //GIVEN
+            // GIVEN
             val settingsRepository = FakeSettingsRepository()
             val viewModel = SettingsViewModel(settingsRepository)
 
             viewModel.uiState.test {
                 awaitItem()
 
-                //WHEN
+                // WHEN
                 viewModel.setInStockOnly(true)
 
-                //THEN
+                // THEN
                 val updateState = awaitItem()
                 assertEquals(true, updateState.inStockOnly)
 

@@ -19,51 +19,63 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class ProductListViewModel @Inject constructor(
+class ProductListViewModel
+@Inject
+constructor(
     getProductsUseCase: GetProductsUseCase,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
-    val uiState: StateFlow<ProductListUiState> = combine(
-        getProductsUseCase(), settingsRepository.selectedCategory, settingsRepository.sortOption
-    ) { products, selectedCategory, sortOption ->
-        var filteredProducts = products
-        if (selectedCategory != null) {
-            filteredProducts = filteredProducts.filter { it.product.category == selectedCategory }
-        }
+    val uiState: StateFlow<ProductListUiState> =
+        combine(
+            getProductsUseCase(),
+            settingsRepository.selectedCategory,
+            settingsRepository.sortOption,
+        ) { products, selectedCategory, sortOption ->
+            var filteredProducts = products
+            if (selectedCategory != null) {
+                filteredProducts = filteredProducts.filter { it.product.category == selectedCategory }
+            }
 
-        val sorted = when (sortOption) {
-            SortOption.NONE -> filteredProducts
-            SortOption.PRICE_ASC -> filteredProducts.sortedBy { effecticePrice(it) }
-            SortOption.PRICE_DESC -> filteredProducts.sortedByDescending { effecticePrice(it) }
-            SortOption.DISCOUNT -> filteredProducts.sortedWith(compareByDescending<ProductWithPromotion> {
-                effectiveDiscountPercent(it)
-            }.thenBy {
-                it.promotion == null
-            })
-        }
+            val sorted =
+                when (sortOption) {
+                    SortOption.NONE -> filteredProducts
+                    SortOption.PRICE_ASC -> filteredProducts.sortedBy { effecticePrice(it) }
+                    SortOption.PRICE_DESC -> filteredProducts.sortedByDescending { effecticePrice(it) }
+                    SortOption.DISCOUNT ->
+                        filteredProducts.sortedWith(
+                            compareByDescending<ProductWithPromotion> {
+                                effectiveDiscountPercent(it)
+                            }.thenBy {
+                                it.promotion == null
+                            },
+                        )
+                }
 
-        val categories = products.map { it.product.category }.distinct().sorted()
+            val categories = products.map { it.product.category }.distinct().sorted()
 
-        ProductListUiState.Success(
-            products = sorted,
-            categories = categories,
-            selectedCategory = selectedCategory,
-            sortOption = sortOption
-        ) as ProductListUiState
-    }.catch { exception: Throwable ->
-        emit(ProductListUiState.Error(exception.message.orEmpty()))
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = ProductListUiState.Loading
-    )
+            ProductListUiState.Success(
+                products = sorted,
+                categories = categories,
+                selectedCategory = selectedCategory,
+                sortOption = sortOption,
+            ) as ProductListUiState
+        }.catch { exception: Throwable ->
+            emit(ProductListUiState.Error(exception.message.orEmpty()))
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ProductListUiState.Loading,
+        )
 
     private val _events = MutableSharedFlow<ProductListEvent>(extraBufferCapacity = 1)
     val events: SharedFlow<ProductListEvent> = _events
 
-    val filtersVisible: StateFlow<Boolean> = settingsRepository.filtersVisible.stateIn(
-        scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = false
-    )
+    val filtersVisible: StateFlow<Boolean> =
+        settingsRepository.filtersVisible.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false,
+        )
 
     fun setCategory(category: String?) {
         viewModelScope.launch {
@@ -83,18 +95,15 @@ class ProductListViewModel @Inject constructor(
         }
     }
 
-    private fun effectiveDiscountPercent(item: ProductWithPromotion): Double {
-        return when (val promo = item.promotion) {
+    private fun effectiveDiscountPercent(item: ProductWithPromotion): Double =
+        when (val promo = item.promotion) {
             is ProductPromotion.Percent -> promo.percent
             else -> 0.0
         }
-    }
 
-    private fun effecticePrice(item: ProductWithPromotion): Double {
-        return when (val promo = item.promotion) {
+    private fun effecticePrice(item: ProductWithPromotion): Double =
+        when (val promo = item.promotion) {
             is ProductPromotion.Percent -> promo.discountedPrice
             else -> item.product.price
         }
     }
-
-}

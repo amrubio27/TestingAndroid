@@ -11,12 +11,10 @@ import org.junit.Rule
 import org.junit.Test
 
 class MainViewModelTest {
-
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private fun createViewModel(fakeSettingsRepository: SettingsRepository = FakeSettingsRepository()) =
-        MainViewModel(fakeSettingsRepository)
+    private fun createViewModel(fakeSettingsRepository: SettingsRepository = FakeSettingsRepository()) = MainViewModel(fakeSettingsRepository)
 
     @Test
     fun `given repository with dark mode when initialized then emits dark theme mode`() =

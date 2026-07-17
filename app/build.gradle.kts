@@ -5,14 +5,17 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.kover)
 }
 
 android {
     namespace = "com.amrubio27.cursotestingandroid"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version =
+            release(36) {
+                minorApiLevel = 1
+            }
     }
 
     sourceSets {
@@ -39,7 +42,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -51,13 +54,33 @@ android {
         compose = true
         buildConfig = true
     }
-    kotlin{
+    kotlin {
         jvmToolchain(17)
+    }
+    kover {
+        reports {
+            filters {
+                excludes {
+                    classes(
+                        "*.databinding.*",
+                        "*.BuildConfig",
+                        "*Activity*",
+                        "*Screen*",
+                        "*ComposableSingletons*",
+                    )
+                }
+            }
+            verify {
+                rule {
+                    minBound(20)
+                }
+            }
+        }
     }
 }
 
 dependencies {
-    //core
+    // core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -68,53 +91,52 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
 
-    //Images
+    // Images
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    //Navigation3
+    // Navigation3
     implementation(libs.navigation3.runtime)
     implementation(libs.navigation3.ui)
 
-    //Hilt
+    // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.lifecycle.viewmodel.compose)
     ksp(libs.hilt.compiler.ksp)
 
-    //Room
+    // Room
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
     ksp(libs.room.compiler.ksp)
 
-    //DataStore
+    // DataStore
     implementation(libs.datastore.preferences)
 
-    //Coroutines
+    // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    //ViewModel
+    // ViewModel
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    //Retrofit
+    // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
 
-    //Serialization
+    // Serialization
     implementation(libs.kotlinx.serialization.json)
 
-    //UnitTest
+    // UnitTest
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.mockwebserver)
 
-
-    //IntegrationTest
+    // IntegrationTest
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

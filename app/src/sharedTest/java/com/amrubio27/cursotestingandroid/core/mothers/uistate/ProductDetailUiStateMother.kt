@@ -7,18 +7,18 @@ import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductPromoti
 import com.amrubio27.cursotestingandroid.productlist.domain.model.ProductWithPromotion
 
 object ProductDetailUiStateMother {
-
     fun success(
         product: Product = ProductMother.coffee(),
         promotion: ProductPromotion? = null,
-        isLoading: Boolean = false
+        isLoading: Boolean = false,
     ) = ProductDetailUiState(
         item = ProductWithPromotion(product, promotion),
-        isLoading = isLoading
+        isLoading = isLoading,
     )
 
-    fun loading() = ProductDetailUiState(
-        item = null,
-        isLoading = true
-    )
+    fun loading() =
+        ProductDetailUiState(
+            item = null,
+            isLoading = true,
+        )
 }

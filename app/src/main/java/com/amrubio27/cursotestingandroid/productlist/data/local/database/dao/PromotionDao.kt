@@ -24,6 +24,4 @@ interface PromotionDao {
         clearPromotions()
         insertPromotions(promotions)
     }
-
-
 }
