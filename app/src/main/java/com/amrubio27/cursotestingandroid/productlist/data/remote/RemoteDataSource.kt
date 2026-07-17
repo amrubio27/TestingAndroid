@@ -1,5 +1,6 @@
 package com.amrubio27.cursotestingandroid.productlist.data.remote
 
+import com.amrubio27.cursotestingandroid.checkout.data.remote.response.OrderConfirmationResponse
 import com.amrubio27.cursotestingandroid.core.domain.model.AppError
 import com.amrubio27.cursotestingandroid.productlist.data.remote.response.ProductResponse
 import com.amrubio27.cursotestingandroid.productlist.data.remote.response.PromotionResponse
@@ -26,6 +27,14 @@ constructor(
         try {
             val response = miniMarketApiService.getPromotions()
             Result.success(response.promotions)
+        } catch (e: Exception) {
+            Result.failure(exception = mapToDomainError(e))
+        }
+
+    suspend fun placeOrder(): Result<OrderConfirmationResponse> =
+        try {
+            val response = miniMarketApiService.placeOrder()
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(exception = mapToDomainError(e))
         }
