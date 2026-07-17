@@ -8,6 +8,8 @@ import androidx.room.Room
 import com.amrubio27.cursotestingandroid.cart.data.local.database.dao.CartItemDao
 import com.amrubio27.cursotestingandroid.cart.data.repository.CartItemRepositoryImpl
 import com.amrubio27.cursotestingandroid.cart.domain.repository.CartItemRepository
+import com.amrubio27.cursotestingandroid.checkout.data.repository.OrderRepositoryImpl
+import com.amrubio27.cursotestingandroid.checkout.domain.repository.OrderRepository
 import com.amrubio27.cursotestingandroid.core.data.coroutines.DefaultDispatchersProvider
 import com.amrubio27.cursotestingandroid.core.data.local.database.MiniMarketDatabase
 import com.amrubio27.cursotestingandroid.core.data.util.SystemClock
@@ -83,6 +85,12 @@ object DataModule {
     @Singleton
     fun provideCartRepository(cartItemRepositoryImpl: CartItemRepositoryImpl): CartItemRepository =
         cartItemRepositoryImpl
+
+    @Provides
+    @Singleton
+    fun provideOrderRepository(orderRepositoryImpl: OrderRepositoryImpl): OrderRepository {
+        return orderRepositoryImpl
+    }
 
     @Provides
     @Singleton
