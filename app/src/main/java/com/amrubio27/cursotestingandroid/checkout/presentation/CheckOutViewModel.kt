@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,5 +59,38 @@ class CheckOutViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = CheckOutUiState.Loading
     )
+
+
+    fun retry() {
+        submission.value = Submission.Idle
+    }
+
+    fun updateName(name: String) {
+        formState.value = formState.value.copy(name = name)
+    }
+
+    fun updateEmail(email: String) {
+        formState.value = formState.value.copy(email = email)
+    }
+
+    fun updateAddress(address: String) {
+        formState.value = formState.value.copy(address = address)
+    }
+
+    fun confirmOrder() {
+        if (!formState.value.validate().isValid) return
+
+        viewModelScope.launch {
+            submission.value = Submission.Submitting
+            placeOrderUseCase()
+                .onSuccess {
+                    submission.value = Submission.Success(it)
+                }
+                .onFailure {
+                    submission.value = Submission.Failed(it.message.orEmpty())
+                    _events.emit(CheckOutEvent.ShowMessage(it.message.orEmpty()))
+                }
+        }
+    }
 
 }
