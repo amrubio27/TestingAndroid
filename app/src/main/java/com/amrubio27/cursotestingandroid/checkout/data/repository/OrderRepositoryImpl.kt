@@ -4,7 +4,7 @@ import com.amrubio27.cursotestingandroid.checkout.data.mapper.toDomain
 import com.amrubio27.cursotestingandroid.checkout.domain.model.OrderConfirmation
 import com.amrubio27.cursotestingandroid.checkout.domain.repository.OrderRepository
 import com.amrubio27.cursotestingandroid.productlist.data.remote.RemoteDataSource
-import jakarta.inject.Inject
+import javax.inject.Inject
 
 class OrderRepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSource

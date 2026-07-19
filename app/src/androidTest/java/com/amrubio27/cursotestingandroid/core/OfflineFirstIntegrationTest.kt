@@ -10,7 +10,6 @@ import com.amrubio27.cursotestingandroid.core.utils.asAsset
 import com.amrubio27.cursotestingandroid.productlist.domain.repository.ProductRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import jakarta.inject.Inject
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.first
@@ -19,6 +18,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
 import kotlin.test.assertFailsWith
 
 @HiltAndroidTest
