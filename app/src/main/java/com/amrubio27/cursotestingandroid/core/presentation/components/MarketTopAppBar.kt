@@ -21,8 +21,8 @@ import com.amrubio27.cursotestingandroid.core.presentation.testing.UiTestTag.TOP
 @Composable
 fun MarketTopAppBar(
     modifier: Modifier = Modifier,
-    onBackSelected: () -> Unit,
     title: String,
+    onBackSelected: () -> Unit,
 ) {
     TopAppBar(
         modifier = modifier,
